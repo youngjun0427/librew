@@ -6,7 +6,6 @@ import {
   onSnapshot,
   orderBy,
   query,
-  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { useEffect } from "react";
@@ -17,17 +16,31 @@ import type { Bean } from "../types";
 
 export function useBeans() {
   const { user } = useAuthStore();
-  const { beans, setBeans } = useBeanStore();
+  const { beans, isLoading, error, setBeans, setLoading, setError } = useBeanStore();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
     const q = query(
       collection(db, "users", user.uid, "beans"),
       orderBy("purchasedAt", "desc")
     );
-    return onSnapshot(q, (snapshot) => {
-      setBeans(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Bean));
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        setBeans(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Bean));
+        setLoading(false);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
   }, [user]);
 
   const addBean = (data: Omit<Bean, "id">) => {
@@ -45,5 +58,5 @@ export function useBeans() {
     return deleteDoc(doc(db, "users", user.uid, "beans", id));
   };
 
-  return { beans, addBean, updateBean, deleteBean };
+  return { beans, isLoading, error, addBean, updateBean, deleteBean };
 }

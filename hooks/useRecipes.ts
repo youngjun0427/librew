@@ -17,17 +17,31 @@ import type { Recipe } from "../types";
 
 export function useRecipes() {
   const { user } = useAuthStore();
-  const { recipes, setRecipes } = useRecipeStore();
+  const { recipes, isLoading, error, setRecipes, setLoading, setError } = useRecipeStore();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
     const q = query(
       collection(db, "users", user.uid, "recipes"),
       orderBy("createdAt", "desc")
     );
-    return onSnapshot(q, (snapshot) => {
-      setRecipes(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Recipe));
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        setRecipes(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Recipe));
+        setLoading(false);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
   }, [user]);
 
   const addRecipe = (data: Omit<Recipe, "id" | "createdAt">) => {
@@ -48,5 +62,5 @@ export function useRecipes() {
     return deleteDoc(doc(db, "users", user.uid, "recipes", id));
   };
 
-  return { recipes, addRecipe, updateRecipe, deleteRecipe };
+  return { recipes, isLoading, error, addRecipe, updateRecipe, deleteRecipe };
 }

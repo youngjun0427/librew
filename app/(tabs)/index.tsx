@@ -1,5 +1,7 @@
 import type { Timestamp } from "firebase/firestore";
 import { Text, View } from "react-native";
+import { ErrorView } from "../../components/ErrorView";
+import { LoadingView } from "../../components/LoadingView";
 import { useBeans } from "../../hooks/useBeans";
 import { useBrewLogs } from "../../hooks/useBrewLogs";
 
@@ -32,8 +34,11 @@ function StatCard({ label, value }: { label: string; value: string }) {
 }
 
 export default function DashboardScreen() {
-  const { brewLogs } = useBrewLogs();
-  const { beans } = useBeans();
+  const { brewLogs, isLoading: logsLoading, error: logsError } = useBrewLogs();
+  const { beans, isLoading: beansLoading, error: beansError } = useBeans();
+
+  if (logsLoading || beansLoading) return <LoadingView />;
+  if (logsError || beansError) return <ErrorView message={logsError ?? beansError ?? undefined} />;
 
   const todayCount = brewLogs.filter((log) => isToday(log.brewedAt)).length;
 
@@ -50,7 +55,6 @@ export default function DashboardScreen() {
   return (
     <View className="flex-1 bg-gray-50 px-6 pt-16">
       <Text className="mb-8 text-2xl font-bold text-gray-900">대시보드</Text>
-
       <View className="gap-4">
         <StatCard label="오늘 추출" value={`${todayCount}잔`} />
         <StatCard label="이번주 섭취량" value={`${weeklyIntake}g`} />

@@ -17,17 +17,31 @@ import type { BrewLog } from "../types";
 
 export function useBrewLogs() {
   const { user } = useAuthStore();
-  const { brewLogs, setBrewLogs } = useBrewLogStore();
+  const { brewLogs, isLoading, error, setBrewLogs, setLoading, setError } = useBrewLogStore();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
     const q = query(
       collection(db, "users", user.uid, "brewLogs"),
       orderBy("brewedAt", "desc")
     );
-    return onSnapshot(q, (snapshot) => {
-      setBrewLogs(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as BrewLog));
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        setBrewLogs(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as BrewLog));
+        setLoading(false);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
   }, [user]);
 
   const addBrewLog = (data: Omit<BrewLog, "id" | "brewedAt">) => {
@@ -48,5 +62,5 @@ export function useBrewLogs() {
     return deleteDoc(doc(db, "users", user.uid, "brewLogs", id));
   };
 
-  return { brewLogs, addBrewLog, updateBrewLog, deleteBrewLog };
+  return { brewLogs, isLoading, error, addBrewLog, updateBrewLog, deleteBrewLog };
 }

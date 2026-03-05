@@ -1,5 +1,7 @@
 import { useRouter } from "expo-router";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { ErrorView } from "../../components/ErrorView";
+import { LoadingView } from "../../components/LoadingView";
 import { useRecipes } from "../../hooks/useRecipes";
 import type { Recipe } from "../../types";
 
@@ -23,8 +25,11 @@ function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () => void }
 }
 
 export default function RecipesScreen() {
-  const { recipes } = useRecipes();
+  const { recipes, isLoading, error } = useRecipes();
   const router = useRouter();
+
+  if (isLoading) return <LoadingView />;
+  if (error) return <ErrorView message={error} />;
 
   return (
     <View className="flex-1 bg-gray-50">

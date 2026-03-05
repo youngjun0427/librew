@@ -58,7 +58,7 @@ type Props = {
 
 export function BeanForm({ defaultValues, onSubmit, onBack, title, submitLabel = "저장" }: Props) {
   const today = new Date().toISOString().split("T")[0];
-  const { control, handleSubmit } = useForm<BeanFormValues>({
+  const { control, handleSubmit, formState: { isSubmitting } } = useForm<BeanFormValues>({
     defaultValues: {
       name: "",
       roastery: "",
@@ -247,10 +247,13 @@ export function BeanForm({ defaultValues, onSubmit, onBack, title, submitLabel =
         </Field>
 
         <TouchableOpacity
-          className="rounded-xl bg-amber-500 py-4"
+          className={`rounded-xl py-4 ${isSubmitting ? "bg-amber-300" : "bg-amber-500"}`}
           onPress={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
         >
-          <Text className="text-center font-semibold text-white">{submitLabel}</Text>
+          <Text className="text-center font-semibold text-white">
+            {isSubmitting ? "저장 중..." : submitLabel}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

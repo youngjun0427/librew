@@ -40,7 +40,7 @@ type Props = {
 };
 
 export function RecipeForm({ defaultValues, onSubmit, onBack, title, submitLabel = "저장" }: Props) {
-  const { control, handleSubmit } = useForm<RecipeFormValues>({
+  const { control, handleSubmit, formState: { isSubmitting } } = useForm<RecipeFormValues>({
     defaultValues: {
       title: "",
       brewMethod: "V60",
@@ -250,8 +250,14 @@ export function RecipeForm({ defaultValues, onSubmit, onBack, title, submitLabel
           <Text className="text-center text-blue-500">+ 단계 추가</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="rounded-xl bg-blue-500 py-4" onPress={handleSubmit(onSubmit)}>
-          <Text className="text-center font-semibold text-white">{submitLabel}</Text>
+        <TouchableOpacity
+          className={`rounded-xl py-4 ${isSubmitting ? "bg-blue-300" : "bg-blue-500"}`}
+          onPress={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
+        >
+          <Text className="text-center font-semibold text-white">
+            {isSubmitting ? "저장 중..." : submitLabel}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

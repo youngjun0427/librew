@@ -1,5 +1,7 @@
 import { useRouter } from "expo-router";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { ErrorView } from "../../components/ErrorView";
+import { LoadingView } from "../../components/LoadingView";
 import { useBeans } from "../../hooks/useBeans";
 import type { Bean } from "../../types";
 
@@ -25,8 +27,11 @@ function BeanCard({ bean, onPress }: { bean: Bean; onPress: () => void }) {
 }
 
 export default function BeansScreen() {
-  const { beans } = useBeans();
+  const { beans, isLoading, error } = useBeans();
   const router = useRouter();
+
+  if (isLoading) return <LoadingView />;
+  if (error) return <ErrorView message={error} />;
 
   return (
     <View className="flex-1 bg-gray-50">

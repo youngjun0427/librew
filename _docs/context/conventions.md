@@ -6,17 +6,18 @@
 - 컴포넌트는 함수형, `export default` 사용
 - Firestore 로직은 `hooks/` 로 분리
 - 비즈니스 로직은 커스텀 훅으로 분리, 컴포넌트에 직접 작성 금지
-- 스타일은 NativeWind 클래스 기반, 인라인 스타일 최소화
+- 스타일은 Tailwind CSS 클래스 기반, 인라인 스타일 최소화
 
 ## 폴더 구조
 
 ```
-app/                  # Expo Router 라우팅
-components/           # 공통 컴포넌트
-hooks/                # 커스텀 훅 (Firestore 연동, 비즈니스 로직)
-store/                # Zustand 스토어
-lib/                  # Firebase 초기화, 유틸 함수
-types/                # TypeScript 타입 정의
+src/
+  pages/              # 라우트별 페이지 컴포넌트 (React Router v6)
+  components/         # 공통 컴포넌트
+  hooks/              # 커스텀 훅 (Firestore 연동, 비즈니스 로직)
+  store/              # Zustand 스토어
+  lib/                # Firebase 초기화, 유틸 함수
+  types/              # TypeScript 타입 정의
 _docs/                # 기획 문서
 _devlog/              # 개발 로그
 ```

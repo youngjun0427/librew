@@ -4,10 +4,10 @@
 1인 프론트엔드 개발 / 이직 포트폴리오 겸 실력 향상 목적.
 
 ## 스택
-Expo (React Native Web) · TypeScript · Zustand · NativeWind v4 · Firebase · Gemini 1.5 Flash
+Vite · React 18 · TypeScript · React Router v6 · Zustand · Tailwind CSS · Firebase · Capacitor · Gemini 1.5 Flash
 
 ## 플랫폼
-iOS / Android 앱스토어 + 웹 동시 배포 (웹 먼저 개발 → 앱 UI 다듬기)
+iOS / Android 앱스토어 + 웹 동시 배포 (Capacitor 하이브리드 앱 껍데기, 웹 먼저 개발 → 앱 UI 다듬기)
 
 ## 상세 문서
 - 아키텍처 / 데이터 구조: `_docs/context/architecture.md`

@@ -53,18 +53,16 @@ const error = recipesError || beansError;
 // ✅ React Hook Form isSubmitting 활용
 const { formState: { isSubmitting } } = useForm();
 
-<TouchableOpacity
+<button
   disabled={isSubmitting}
-  className={isSubmitting ? "bg-blue-300" : "bg-blue-500"}
-  onPress={handleSubmit(onSubmit)}
+  className={isSubmitting ? "bg-amber-300" : "bg-amber-400"}
+  onClick={handleSubmit(onSubmit)}
 >
-  <Text>{isSubmitting ? "저장 중..." : "저장"}</Text>
-</TouchableOpacity>
+  {isSubmitting ? "저장 중..." : "저장"}
+</button>
 
 // ❌ 잘못된 패턴 — 중복 제출 가능
-<TouchableOpacity onPress={handleSubmit(onSubmit)}>
-  <Text>저장</Text>
-</TouchableOpacity>
+<button onClick={handleSubmit(onSubmit)}>저장</button>
 ```
 
 ### 필수 필드 검증
@@ -106,11 +104,13 @@ function toRecipe(doc: DocumentSnapshot): Recipe | null {
 
 ### 현재 컴포넌트 구조
 ```
-components/
-  RecipeForm.tsx   — 레시피 생성/수정 공유 폼
-  BeanForm.tsx     — 원두 생성/수정 공유 폼
-  LoadingView.tsx  — 전역 로딩 UI
-  ErrorView.tsx    — 전역 에러 UI
+src/components/
+  RecipeForm.tsx      — 레시피 생성/수정 공유 폼
+  BeanForm.tsx        — 원두 생성/수정 공유 폼
+  EquipmentForm.tsx   — 장비 생성/수정 공유 폼
+  Toggle.tsx          — 커스텀 토글 (웹 Switch 대체)
+  LoadingView.tsx     — 전역 로딩 UI
+  ErrorView.tsx       — 전역 에러 UI
 ```
 
 ---
@@ -122,10 +122,9 @@ components/
 - 이상적 해결: 루트 레이아웃에서 단 1회 구독, 스토어에 저장, 스크린은 스토어만 읽기
 - 현재 규모에서는 기능 영향 없으나, 배포 전 개선 권장
 
-### FlatList 최적화
-- `keyExtractor` 필수 (완료 ✅)
-- `getItemLayout` — 고정 높이 아이템이면 추가 가능 (성능 향상)
-- `initialNumToRender` — 기본값(10)으로 충분한지 확인
+### 리스트 렌더링
+- `key` prop 필수 (`.map()` 사용 시 고유 ID 사용)
+- 긴 리스트는 가상화 고려 (현재 규모에서는 불필요)
 
 ---
 

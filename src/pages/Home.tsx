@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../lib/firebase";
 import { ErrorView } from "../components/ErrorView";
 import { LoadingView } from "../components/LoadingView";
 import { useBrewLogs } from "../hooks/useBrewLogs";
@@ -61,6 +63,16 @@ export default function HomePage() {
   const { recipes, isLoading: recLoading, error: recError } = useRecipes();
   const { brewLogs, isLoading: logLoading } = useBrewLogs();
 
+  const handleLogout = async () => {
+    if (window.confirm("로그아웃 하시겠습니까?")) {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error("로그아웃 실패:", error);
+      }
+    }
+  };
+
   const isLoading = eqLoading || recLoading || logLoading;
   const error = eqError || recError;
 
@@ -79,6 +91,7 @@ export default function HomePage() {
         <div className="flex gap-4">
           <button onClick={() => navigate("/bean")} className="text-sm text-zinc-400">원두</button>
           <button onClick={() => navigate("/log")} className="text-sm text-zinc-400">기록</button>
+          <button onClick={handleLogout} className="text-sm text-zinc-400">설정</button>
         </div>
       </div>
 

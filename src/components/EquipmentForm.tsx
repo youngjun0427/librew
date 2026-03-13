@@ -93,7 +93,6 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
   });
 
   const type = watch("type");
-  const brand = watch("brand");
   const model = watch("model");
 
   // 그라인더 브랜드 피커 상태

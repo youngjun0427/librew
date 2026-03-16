@@ -26,21 +26,15 @@ export function useRecipes() {
     if (initialized) return;
 
     setLoading(true);
-    console.time("[Recipes] getDocs");
-    console.log("[Recipes] getDocs 시작:", new Date().toISOString());
     const q = query(collection(db, "users", user.uid, "recipes"));
     getDocs(q)
       .then((snapshot) => {
-        console.timeEnd("[Recipes] getDocs");
-        console.log("[Recipes] 문서 수:", snapshot.docs.length);
         const sorted = snapshot.docs
           .map((d) => ({ id: d.id, ...d.data() }) as Recipe)
           .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
         setRecipes(sorted);
       })
       .catch((err) => {
-        console.timeEnd("[Recipes] getDocs");
-        console.error("[Recipes] 에러:", err.code, err.message);
         setError(err.message);
       })
       .finally(() => {

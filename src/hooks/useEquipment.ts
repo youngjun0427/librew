@@ -26,21 +26,15 @@ export function useEquipment() {
     if (initialized) return;
 
     setLoading(true);
-    console.time("[Equipment] getDocs");
-    console.log("[Equipment] getDocs 시작:", new Date().toISOString());
     const q = query(collection(db, "users", user.uid, "equipment"));
     getDocs(q)
       .then((snapshot) => {
-        console.timeEnd("[Equipment] getDocs");
-        console.log("[Equipment] 문서 수:", snapshot.docs.length);
         const sorted = snapshot.docs
           .map((d) => ({ id: d.id, ...d.data() }) as Equipment)
           .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
         setEquipment(sorted);
       })
       .catch((err) => {
-        console.timeEnd("[Equipment] getDocs");
-        console.error("[Equipment] 에러:", err.code, err.message);
         setError(err.message);
       })
       .finally(() => {

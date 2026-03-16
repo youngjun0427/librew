@@ -20,6 +20,7 @@ const EquipmentListPage = lazy(() => import("./pages/equipment/EquipmentList"));
 const EquipmentNewPage = lazy(() => import("./pages/equipment/EquipmentNew"));
 const LogDetailPage = lazy(() => import("./pages/log/LogDetail"));
 const LogListPage = lazy(() => import("./pages/log/LogList"));
+const MyPage = lazy(() => import("./pages/MyPage"));
 const RecipeDetailPage = lazy(() => import("./pages/recipe/RecipeDetail"));
 const RecipeEditPage = lazy(() => import("./pages/recipe/RecipeEdit"));
 const RecipeListPage = lazy(() => import("./pages/recipe/RecipeList"));
@@ -66,6 +67,7 @@ export default function App() {
           <Route path="/brew/evaluate" element={<AuthGuard><BrewEvaluatePage /></AuthGuard>} />
           <Route path="/log" element={<AuthGuard><LogListPage /></AuthGuard>} />
           <Route path="/log/:id" element={<AuthGuard><LogDetailPage /></AuthGuard>} />
+          <Route path="/mypage" element={<AuthGuard><MyPage /></AuthGuard>} />
         </Routes>
       </Suspense>
     </HashRouter>

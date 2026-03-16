@@ -13,7 +13,7 @@ const EQUIPMENT_ICONS: Record<Equipment["type"], string> = {
   grinder: "⚙️", kettle: "🫖", dripper: "☕", scale: "⚖️", other: "🔧",
 };
 
-type Sheet = "recipe" | "bean" | null;
+type Sheet = "recipe" | "bean" | "grinder" | "dripper" | "other" | null;
 
 function PrepRow({
   icon, label, value, sub, onPress, onAction, actionLabel,
@@ -63,8 +63,12 @@ export default function BrewPrepPage() {
   const { equipment, isLoading: equipmentLoading } = useEquipment();
   const { brewLogs } = useBrewLogs();
   const isLoading = recipesLoading || beansLoading || equipmentLoading;
-  const { selectedRecipe, selectedBean, usedCoffeeWeight, setSelectedRecipe, setSelectedBean, setUsedCoffeeWeight } =
-    useBrewSessionStore();
+  const {
+    selectedRecipe, selectedBean, usedCoffeeWeight,
+    selectedGrinder, selectedDripper, selectedOtherEquipment,
+    setSelectedRecipe, setSelectedBean, setUsedCoffeeWeight,
+    setSelectedGrinder, setSelectedDripper, setSelectedOtherEquipment,
+  } = useBrewSessionStore();
 
   const lastTips: NextBrewTips | null = selectedRecipe
     ? (brewLogs
@@ -177,37 +181,37 @@ export default function BrewPrepPage() {
         />
         <div className="h-px bg-zinc-800" />
 
-        {/* Equipment */}
-        <div className="py-4">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">장비</p>
-            <button onClick={() => navigate("/equipment")} className="text-xs text-amber-400">
-              편집 ›
-            </button>
-          </div>
-          {equipment.length === 0 ? (
-            <button onClick={() => navigate("/equipment/new")} className="text-sm text-zinc-500">
-              장비를 등록해주세요 →
-            </button>
-          ) : (
-            <div className="flex flex-col gap-1">
-              {equipment.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => navigate(`/equipment/${item.id}`)}
-                  className="flex items-center gap-2 py-1.5"
-                >
-                  <span>{EQUIPMENT_ICONS[item.type]}</span>
-                  <span className="flex-1 text-left text-sm font-medium text-white">{item.name}</span>
-                  {item.specs.clickUnit && (
-                    <span className="text-xs text-zinc-500">{item.specs.clickUnit}</span>
-                  )}
-                  <span className="text-xs text-zinc-600">›</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Grinder */}
+        <PrepRow
+          icon="⚙️"
+          label="그라인더"
+          value={selectedGrinder?.name ?? null}
+          sub={selectedGrinder?.specs.clickUnit ? `클릭 단위: ${selectedGrinder.specs.clickUnit}` : undefined}
+          onPress={() => setSheet("grinder")}
+          onAction={() => navigate("/equipment/new")}
+          actionLabel="+ 추가"
+        />
+        <div className="h-px bg-zinc-800" />
+
+        {/* Dripper */}
+        <PrepRow
+          icon="☕"
+          label="드리퍼"
+          value={selectedDripper?.name ?? null}
+          sub={selectedDripper?.specs.filterType ? `필터: ${selectedDripper.specs.filterType}` : undefined}
+          onPress={() => setSheet("dripper")}
+          onAction={() => navigate("/equipment/new")}
+          actionLabel="+ 추가"
+        />
+        <div className="h-px bg-zinc-800" />
+
+        {/* Other equipment */}
+        <PrepRow
+          icon="🔧"
+          label="기타장비 (선택)"
+          value={selectedOtherEquipment?.name ?? null}
+          onPress={() => setSheet("other")}
+        />
         <div className="h-px bg-zinc-800" />
 
         {/* Coffee weight */}
@@ -264,6 +268,47 @@ export default function BrewPrepPage() {
             />
           ))
         )}
+      </BottomSheet>
+
+      {/* Grinder sheet */}
+      <BottomSheet isOpen={sheet === "grinder"} onClose={() => setSheet(null)} title="그라인더 선택">
+        <EquipmentSelectList
+          items={equipment.filter((e) => e.type === "grinder")}
+          selected={selectedGrinder}
+          onSelect={(e) => { setSelectedGrinder(e); setSheet(null); }}
+          onAdd={() => { setSheet(null); navigate("/equipment/new"); }}
+          emptyLabel="등록된 그라인더가 없어요"
+        />
+      </BottomSheet>
+
+      {/* Dripper sheet */}
+      <BottomSheet isOpen={sheet === "dripper"} onClose={() => setSheet(null)} title="드리퍼 선택">
+        <EquipmentSelectList
+          items={equipment.filter((e) => e.type === "dripper")}
+          selected={selectedDripper}
+          onSelect={(e) => { setSelectedDripper(e); setSheet(null); }}
+          onAdd={() => { setSheet(null); navigate("/equipment/new"); }}
+          emptyLabel="등록된 드리퍼가 없어요"
+        />
+      </BottomSheet>
+
+      {/* Other equipment sheet */}
+      <BottomSheet isOpen={sheet === "other"} onClose={() => setSheet(null)} title="기타장비 선택">
+        <button
+          className="mb-2 flex w-full items-center py-3 text-zinc-400"
+          onClick={() => { setSelectedOtherEquipment(null); setSheet(null); }}
+        >
+          <span className="flex-1 text-left text-sm">선택 안 함</span>
+          {!selectedOtherEquipment && <span className="text-amber-400 text-sm">✓</span>}
+        </button>
+        <div className="mb-2 h-px bg-zinc-800" />
+        <EquipmentSelectList
+          items={equipment.filter((e) => e.type !== "grinder" && e.type !== "dripper")}
+          selected={selectedOtherEquipment}
+          onSelect={(e) => { setSelectedOtherEquipment(e); setSheet(null); }}
+          onAdd={() => { setSheet(null); navigate("/equipment/new"); }}
+          emptyLabel="등록된 기타 장비가 없어요"
+        />
       </BottomSheet>
 
       {/* Bean sheet */}
@@ -324,6 +369,50 @@ function LastBrewTipsCard({ tips }: { tips: NextBrewTips }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function EquipmentSelectList({
+  items, selected, onSelect, onAdd, emptyLabel,
+}: {
+  items: Equipment[];
+  selected: Equipment | null;
+  onSelect: (e: Equipment) => void;
+  onAdd: () => void;
+  emptyLabel: string;
+}) {
+  if (items.length === 0) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-zinc-500">{emptyLabel}</p>
+        <button onClick={onAdd} className="mt-3 text-amber-400">장비 추가하기 →</button>
+      </div>
+    );
+  }
+  return (
+    <>
+      {items.map((item) => (
+        <motion.button
+          key={item.id}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onSelect(item)}
+          className={`mb-2 flex w-full items-center rounded-2xl p-4 text-left ${
+            selected?.id === item.id ? "bg-amber-400/10 ring-1 ring-amber-400" : "bg-zinc-800"
+          }`}
+        >
+          <span className="mr-3 text-xl">{EQUIPMENT_ICONS[item.type]}</span>
+          <div className="flex-1">
+            <p className={`font-semibold ${selected?.id === item.id ? "text-amber-400" : "text-white"}`}>
+              {item.name}
+            </p>
+            {item.specs.clickUnit && (
+              <p className="mt-0.5 text-xs text-zinc-400">클릭 단위: {item.specs.clickUnit}</p>
+            )}
+          </div>
+          {selected?.id === item.id && <span className="text-amber-400">✓</span>}
+        </motion.button>
+      ))}
+    </>
   );
 }
 

@@ -82,23 +82,12 @@ export default function HomePage() {
       <TopBar />
 
       <div className="flex-1 overflow-y-auto px-4 pt-2 space-y-3">
-        {/* Equipment + Bean cards 2x2 grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <NavCard icon="⚙️" label="그라인더" onClick={() => navigate("/equipment")} />
-          <NavCard icon="☕" label="드리퍼" onClick={() => navigate("/equipment")} />
+        {/* Nav cards */}
+        <div className="grid grid-cols-3 gap-3">
+          <NavCard icon="⚙️" label="장비" onClick={() => navigate("/equipment")} />
           <NavCard icon="🫘" label="원두" onClick={() => navigate("/bean")} />
-          <NavCard icon="🔧" label="기타장비" onClick={() => navigate("/equipment")} />
+          <NavCard icon="📋" label="레시피" onClick={() => navigate("/recipe")} />
         </div>
-
-        {/* Recipe card - full width */}
-        <button
-          onClick={() => navigate("/recipe")}
-          className="flex w-full items-center gap-4 rounded-2xl bg-zinc-800 px-5 py-4 active:bg-zinc-700"
-        >
-          <span className="text-2xl">📋</span>
-          <span className="text-sm font-semibold text-white">레시피</span>
-          <span className="ml-auto text-zinc-500">›</span>
-        </button>
 
         {/* Recent logs - bigger card */}
         <div className="rounded-2xl bg-zinc-800 overflow-hidden">

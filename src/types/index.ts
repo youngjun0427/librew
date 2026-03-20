@@ -7,7 +7,6 @@ export interface Equipment {
   model: string;
   type: "grinder" | "kettle" | "dripper" | "scale" | "other";
   specs: EquipmentSpecs;
-  isInCurrentSetup: boolean;
   notes: string | null;
   createdAt: Timestamp;
 }
@@ -31,6 +30,7 @@ export interface Recipe {
   waterWeight: number;
   filterType: string;
   brewMethod: string;
+  grinderName: string | null;
   steps: RecipeStep[];
   isPublic: boolean;
   shareId: string | null;

@@ -31,8 +31,6 @@ export default function BrewEquipmentPage() {
   if (isLoading) return <LoadingView />;
   if (error) return <ErrorView message={error} />;
 
-  const currentSetup = equipment.filter((e) => e.isInCurrentSetup);
-
   return (
     <div className="flex h-screen flex-col bg-zinc-900">
       <div className="px-5 pb-4 pt-14">
@@ -42,16 +40,16 @@ export default function BrewEquipmentPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5">
-        {currentSetup.length === 0 ? (
+        {equipment.length === 0 ? (
           <div className="mt-8 flex flex-col items-center">
-            <p className="text-zinc-400">현재 세팅된 장비가 없어요</p>
+            <p className="text-zinc-400">등록된 장비가 없어요</p>
             <button className="mt-4 text-amber-400" onClick={() => navigate("/equipment")}>
-              장비 세팅하러 가기 →
+              장비 추가하러 가기 →
             </button>
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl bg-zinc-800">
-            {currentSetup.map((item, idx) => (
+            {equipment.map((item, idx) => (
               <div key={item.id}>
                 {idx > 0 && <div className="mx-4 h-px bg-zinc-700" />}
                 <div className="flex items-center px-4 py-3">
@@ -77,11 +75,8 @@ export default function BrewEquipmentPage() {
 
       <div className="px-5 pb-8 pt-4">
         <button
-          className={`w-full items-center justify-center rounded-2xl py-4 text-lg font-bold ${
-            currentSetup.length > 0 ? "bg-amber-400 text-zinc-900" : "bg-zinc-700 text-zinc-500"
-          }`}
+          className="w-full items-center justify-center rounded-2xl bg-amber-400 py-4 text-lg font-bold text-zinc-900"
           onClick={() => navigate("/brew/recipe")}
-          disabled={currentSetup.length === 0}
         >
           다음: 레시피 선택
         </button>

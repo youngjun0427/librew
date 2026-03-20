@@ -17,7 +17,6 @@ export default function EquipmentNewPage() {
       model: data.model,
       type: data.type,
       specs: buildEquipmentSpecs(data),
-      isInCurrentSetup: true,
       notes: data.notes || null,
     });
     navigate(-1);

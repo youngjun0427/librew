@@ -15,7 +15,6 @@ export type EquipmentFormValues = {
   precision: string;
   hasTimer: boolean;
   notes: string;
-  isInCurrentSetup: boolean;
 };
 
 export function buildEquipmentSpecs(data: EquipmentFormValues): EquipmentSpecs {
@@ -26,12 +25,7 @@ export function buildEquipmentSpecs(data: EquipmentFormValues): EquipmentSpecs {
     if (data.capacity) specs.capacity = Number(data.capacity);
     if (data.temperature) specs.temperature = Number(data.temperature);
   } else if (data.type === "dripper") {
-    if (data.filterType) specs.filterType = data.filterType;
     if (data.servings) specs.servings = data.servings;
-  } else if (data.type === "scale") {
-    if (data.precision) specs.precision = data.precision;
-    specs.hasTimer = data.hasTimer;
-  }
   return specs;
 }
 
@@ -56,7 +50,6 @@ const TYPES: { value: Equipment["type"]; label: string }[] = [
   { value: "grinder", label: "그라인더" },
   { value: "kettle", label: "케틀" },
   { value: "dripper", label: "드리퍼" },
-  { value: "scale", label: "저울" },
   { value: "other", label: "기타" },
 ];
 
@@ -79,15 +72,15 @@ type Props = {
   title: string;
   submitLabel?: string;
   showBrandPicker?: boolean;
+  lockedType?: Equipment["type"];
 };
 
-export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLabel = "저장", showBrandPicker = false }: Props) {
+export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLabel = "저장", showBrandPicker = false, lockedType }: Props) {
   const { control, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<EquipmentFormValues>({
     defaultValues: {
       brand: "", model: "", type: "grinder",
       clickUnit: "", capacity: "", temperature: "", filterType: "",
       servings: "", precision: "", hasTimer: false, notes: "",
-      isInCurrentSetup: true,
       ...defaultValues,
     },
   });
@@ -125,33 +118,35 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
           <h1 className="ml-4 text-xl font-bold text-white">{title}</h1>
         </div>
 
-        <Field label="종류">
-          <Controller
-            control={control}
-            name="type"
-            render={({ field: { value, onChange } }) => (
-              <div className="flex flex-wrap gap-2">
-                {TYPES.map((t) => (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => {
-                      onChange(t.value);
-                      setPickerBrand(null);
-                      setValue("brand", "");
-                      setValue("model", "");
-                    }}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium ${
-                      value === t.value ? "bg-amber-400 text-zinc-900" : "bg-zinc-700 text-zinc-300"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          />
-        </Field>
+        {!lockedType && (
+          <Field label="종류">
+            <Controller
+              control={control}
+              name="type"
+              render={({ field: { value, onChange } }) => (
+                <div className="flex flex-wrap gap-2">
+                  {TYPES.map((t) => (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => {
+                        onChange(t.value);
+                        setPickerBrand(null);
+                        setValue("brand", "");
+                        setValue("model", "");
+                      }}
+                      className={`rounded-xl px-4 py-2 text-sm font-medium ${
+                        value === t.value ? "bg-amber-400 text-zinc-900" : "bg-zinc-700 text-zinc-300"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            />
+          </Field>
+        )}
 
         {/* 그라인더 브랜드 피커 */}
         {showPicker ? (
@@ -272,43 +267,13 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
         )}
 
         {type === "dripper" && (
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Field label="필터 종류">
-                <Controller control={control} name="filterType" render={({ field }) => (
-                  <input {...field} className={inputClass} placeholder="종이 필터" />
-                )} />
-              </Field>
-            </div>
-            <div className="flex-1">
-              <Field label="인원">
-                <Controller control={control} name="servings" render={({ field }) => (
-                  <input {...field} className={inputClass} placeholder="1~4인용" />
-                )} />
-              </Field>
-            </div>
-          </div>
+          <Field label="인원">
+            <Controller control={control} name="servings" render={({ field }) => (
+              <input {...field} className={inputClass} placeholder="1~4인용" />
+            )} />
+          </Field>
         )}
 
-        {type === "scale" && (
-          <>
-            <Field label="정밀도">
-              <Controller control={control} name="precision" render={({ field }) => (
-                <input {...field} className={inputClass} placeholder="0.1g" />
-              )} />
-            </Field>
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-medium text-zinc-400">타이머 내장</p>
-              <Controller
-                control={control}
-                name="hasTimer"
-                render={({ field: { value, onChange } }) => (
-                  <Toggle value={value} onChange={onChange} />
-                )}
-              />
-            </div>
-          </>
-        )}
 
         <Field label="메모 (선택)">
           <Controller

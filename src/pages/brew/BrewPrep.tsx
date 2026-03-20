@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomSheet } from "../../components/BottomSheet";
+import { buildEquipmentSpecs, EquipmentForm, type EquipmentFormValues } from "../../components/EquipmentForm";
 import { useBeans } from "../../hooks/useBeans";
 import { useBrewLogs } from "../../hooks/useBrewLogs";
 import { useEquipment } from "../../hooks/useEquipment";
@@ -60,7 +61,7 @@ export default function BrewPrepPage() {
   const navigate = useNavigate();
   const { recipes, isLoading: recipesLoading } = useRecipes();
   const { beans, isLoading: beansLoading } = useBeans();
-  const { equipment, isLoading: equipmentLoading } = useEquipment();
+  const { equipment, isLoading: equipmentLoading, addEquipment } = useEquipment();
   const { brewLogs } = useBrewLogs();
   const isLoading = recipesLoading || beansLoading || equipmentLoading;
   const {
@@ -78,6 +79,7 @@ export default function BrewPrepPage() {
     : null;
 
   const [sheet, setSheet] = useState<Sheet>(null);
+  const [addingEquipment, setAddingEquipment] = useState<Equipment["type"] | null>(null);
   const [coffeeInput, setCoffeeInput] = useState(
     String(usedCoffeeWeight || selectedRecipe?.coffeeWeight || "")
   );
@@ -184,24 +186,20 @@ export default function BrewPrepPage() {
         {/* Grinder */}
         <PrepRow
           icon="⚙️"
-          label="그라인더"
+          label="그라인더 *"
           value={selectedGrinder?.name ?? null}
           sub={selectedGrinder?.specs.clickUnit ? `클릭 단위: ${selectedGrinder.specs.clickUnit}` : undefined}
           onPress={() => setSheet("grinder")}
-          onAction={() => navigate("/equipment/new")}
-          actionLabel="+ 추가"
         />
         <div className="h-px bg-zinc-800" />
 
         {/* Dripper */}
         <PrepRow
           icon="☕"
-          label="드리퍼"
+          label="드리퍼 *"
           value={selectedDripper?.name ?? null}
-          sub={selectedDripper?.specs.filterType ? `필터: ${selectedDripper.specs.filterType}` : undefined}
+          sub={selectedDripper?.specs.servings ? `${selectedDripper.specs.servings}` : undefined}
           onPress={() => setSheet("dripper")}
-          onAction={() => navigate("/equipment/new")}
-          actionLabel="+ 추가"
         />
         <div className="h-px bg-zinc-800" />
 
@@ -237,10 +235,12 @@ export default function BrewPrepPage() {
         <motion.button
           whileTap={{ scale: 0.97 }}
           className={`w-full rounded-2xl py-4 text-lg font-bold transition-colors ${
-            selectedRecipe ? "bg-amber-400 text-zinc-900" : "bg-zinc-800 text-zinc-600"
+            selectedRecipe && selectedGrinder && selectedDripper
+              ? "bg-amber-400 text-zinc-900"
+              : "bg-zinc-800 text-zinc-600"
           }`}
-          onClick={() => selectedRecipe && navigate("/brew/countdown")}
-          disabled={!selectedRecipe}
+          onClick={() => selectedRecipe && selectedGrinder && selectedDripper && navigate("/brew/countdown")}
+          disabled={!selectedRecipe || !selectedGrinder || !selectedDripper}
         >
           ⚡ 추출 시작
         </motion.button>
@@ -276,7 +276,7 @@ export default function BrewPrepPage() {
           items={equipment.filter((e) => e.type === "grinder")}
           selected={selectedGrinder}
           onSelect={(e) => { setSelectedGrinder(e); setSheet(null); }}
-          onAdd={() => { setSheet(null); navigate("/equipment/new"); }}
+          onAdd={() => { setSheet(null); setAddingEquipment("grinder"); }}
           emptyLabel="등록된 그라인더가 없어요"
         />
       </BottomSheet>
@@ -287,7 +287,7 @@ export default function BrewPrepPage() {
           items={equipment.filter((e) => e.type === "dripper")}
           selected={selectedDripper}
           onSelect={(e) => { setSelectedDripper(e); setSheet(null); }}
-          onAdd={() => { setSheet(null); navigate("/equipment/new"); }}
+          onAdd={() => { setSheet(null); setAddingEquipment("dripper"); }}
           emptyLabel="등록된 드리퍼가 없어요"
         />
       </BottomSheet>
@@ -306,10 +306,39 @@ export default function BrewPrepPage() {
           items={equipment.filter((e) => e.type !== "grinder" && e.type !== "dripper")}
           selected={selectedOtherEquipment}
           onSelect={(e) => { setSelectedOtherEquipment(e); setSheet(null); }}
-          onAdd={() => { setSheet(null); navigate("/equipment/new"); }}
+          onAdd={() => { setSheet(null); setAddingEquipment("other"); }}
           emptyLabel="등록된 기타 장비가 없어요"
         />
       </BottomSheet>
+
+      {/* Inline equipment add overlay */}
+      {addingEquipment && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <EquipmentForm
+            title="장비 추가"
+            defaultValues={{ type: addingEquipment }}
+            lockedType={addingEquipment}
+            showBrandPicker
+            onBack={() => setAddingEquipment(null)}
+            onSubmit={async (data: EquipmentFormValues) => {
+              const newEquip = await addEquipment({
+                name: [data.brand, data.model].filter(Boolean).join(" ") || "장비",
+                brand: data.brand,
+                model: data.model,
+                type: data.type,
+                specs: buildEquipmentSpecs(data),
+                notes: data.notes || null,
+              });
+              if (newEquip) {
+                if (newEquip.type === "grinder") setSelectedGrinder(newEquip);
+                else if (newEquip.type === "dripper") setSelectedDripper(newEquip);
+                else setSelectedOtherEquipment(newEquip);
+              }
+              setAddingEquipment(null);
+            }}
+          />
+        </div>
+      )}
 
       {/* Bean sheet */}
       <BottomSheet isOpen={sheet === "bean"} onClose={() => setSheet(null)} title="원두 선택">

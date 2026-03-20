@@ -6,6 +6,7 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 import { useEffect } from "react";
@@ -43,12 +44,16 @@ export function useEquipment() {
       });
   }, [user]);
 
-  const addEquipment = (data: Omit<Equipment, "id" | "createdAt">) => {
+  const addEquipment = async (data: Omit<Equipment, "id" | "createdAt">) => {
     if (!user) return;
-    return addDoc(collection(db, "users", user.uid, "equipment"), {
+    const ref = await addDoc(collection(db, "users", user.uid, "equipment"), {
       ...data,
       createdAt: serverTimestamp(),
     });
+    const newEquip: Equipment = { id: ref.id, ...data, createdAt: Timestamp.now() };
+    const store = useEquipmentStore.getState();
+    store.setEquipment([newEquip, ...store.equipment]);
+    return newEquip;
   };
 
   const updateEquipment = (id: string, data: Partial<Omit<Equipment, "id" | "createdAt">>) => {

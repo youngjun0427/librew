@@ -66,15 +66,17 @@ export default function ShareViewerPage() {
       <h1 className="mb-6 text-2xl font-bold text-white">{r.title}</h1>
 
       <div className="mb-6 rounded-2xl bg-zinc-800 p-5">
-        {([
-          ["추출 방식", r.brewMethod],
-          ["필터", r.filterType],
-          ["분쇄도", String(r.grindSize)],
-          ["물 온도", `${r.waterTemp}°C`],
-          ["원두", `${r.coffeeWeight}g`],
-          ["물", `${r.waterWeight}ml`],
-          ["비율", `1:${ratio}`],
-        ] as [string, string][]).map(([label, value]) => (
+        {(
+          [
+            ["드리퍼", r.brewMethod],
+            ["필터", r.filterType],
+            ["분쇄도", String(r.grindSize)],
+            ["물 온도", `${r.waterTemp}°C`],
+            ["원두", `${r.coffeeWeight}g`],
+            ["물", `${r.waterWeight}ml`],
+            ["비율", `1:${ratio}`],
+          ] as [string, string][]
+        ).map(([label, value]) => (
           <div key={label} className="flex items-center justify-between py-2">
             <span className="text-sm text-zinc-400">{label}</span>
             <span className="text-sm font-medium text-white">{value}</span>
@@ -105,12 +107,18 @@ export default function ShareViewerPage() {
             <p className="text-center font-semibold text-green-400">내 레시피에 추가되었어요!</p>
           </div>
         ) : (
-          <button className="w-full rounded-xl bg-amber-400 py-4 font-semibold text-zinc-900" onClick={handleImport}>
+          <button
+            className="w-full rounded-xl bg-amber-400 py-4 font-semibold text-zinc-900"
+            onClick={handleImport}
+          >
             내 레시피로 가져오기
           </button>
         )
       ) : (
-        <button className="w-full rounded-xl bg-amber-400 py-4 font-semibold text-zinc-900" onClick={() => navigate("/login")}>
+        <button
+          className="w-full rounded-xl bg-amber-400 py-4 font-semibold text-zinc-900"
+          onClick={() => navigate("/login")}
+        >
           로그인하여 가져오기
         </button>
       )}

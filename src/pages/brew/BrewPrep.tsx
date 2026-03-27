@@ -67,8 +67,10 @@ export default function BrewPrepPage() {
   const {
     selectedRecipe, selectedBean, usedCoffeeWeight,
     selectedGrinder, selectedDripper, selectedOtherEquipment,
+    actualGrindSize, actualWaterTemp, actualFilterType,
     setSelectedRecipe, setSelectedBean, setUsedCoffeeWeight,
     setSelectedGrinder, setSelectedDripper, setSelectedOtherEquipment,
+    setActualGrindSize, setActualWaterTemp, setActualFilterType,
   } = useBrewSessionStore();
 
   const lastTips: NextBrewTips | null = selectedRecipe
@@ -80,8 +82,18 @@ export default function BrewPrepPage() {
 
   const [sheet, setSheet] = useState<Sheet>(null);
   const [addingEquipment, setAddingEquipment] = useState<Equipment["type"] | null>(null);
+  
   const [coffeeInput, setCoffeeInput] = useState(
     String(usedCoffeeWeight || selectedRecipe?.coffeeWeight || "")
+  );
+  const [grindInput, setGrindInput] = useState(
+    actualGrindSize ? String(actualGrindSize) : ""
+  );
+  const [tempInput, setTempInput] = useState(
+    actualWaterTemp ? String(actualWaterTemp) : ""
+  );
+  const [filterInput, setFilterInput] = useState(
+    actualFilterType || ""
   );
 
   useEffect(() => {
@@ -97,9 +109,36 @@ export default function BrewPrepPage() {
     if (!isNaN(n) && n > 0) setUsedCoffeeWeight(n);
   }, [coffeeInput]);
 
+  useEffect(() => {
+    if (grindInput) {
+      const n = Number(grindInput);
+      if (!isNaN(n)) setActualGrindSize(n);
+    } else {
+      setActualGrindSize(null);
+    }
+  }, [grindInput]);
+
+  useEffect(() => {
+    if (tempInput) {
+      const n = Number(tempInput);
+      if (!isNaN(n)) setActualWaterTemp(n);
+    } else {
+      setActualWaterTemp(null);
+    }
+  }, [tempInput]);
+
+  useEffect(() => {
+    setActualFilterType(filterInput || null);
+  }, [filterInput]);
+
   const recipeWater = selectedRecipe
     ? (selectedRecipe.steps.reduce((s, step) => s + step.waterAmount, 0) || selectedRecipe.waterWeight)
-    : null;
+    : 0;
+    
+  const rescaledWater = (selectedRecipe && selectedRecipe.coffeeWeight > 0 && usedCoffeeWeight > 0)
+    ? Math.round((recipeWater / selectedRecipe.coffeeWeight) * usedCoffeeWeight)
+    : recipeWater;
+
   const recipeTime = selectedRecipe
     ? selectedRecipe.steps.reduce((s, step) => s + (step.duration ?? 0) + (step.waitTime ?? 0), 0)
     : 0;
@@ -212,17 +251,60 @@ export default function BrewPrepPage() {
         />
         <div className="h-px bg-zinc-800" />
 
-        {/* Coffee weight */}
+        {/* Session Overrides */}
         {selectedRecipe && (
-          <div className="py-4">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-zinc-500">원두량 (g)</p>
-            <input
-              className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-amber-400"
-              value={coffeeInput}
-              onChange={(e) => setCoffeeInput(e.target.value)}
-              inputMode="decimal"
-              placeholder={String(selectedRecipe.coffeeWeight)}
-            />
+          <div className="py-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium uppercase tracking-widest text-amber-400">이번 추출 변수 (Override)</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="mb-2 text-xs font-medium text-zinc-500">원두량 (g)</p>
+                <input
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-amber-400"
+                  value={coffeeInput}
+                  onChange={(e) => setCoffeeInput(e.target.value)}
+                  inputMode="decimal"
+                  placeholder={String(selectedRecipe.coffeeWeight)}
+                />
+                <p className="mt-1.5 text-xs font-medium text-amber-400/80">
+                  자동 예상 물량: {rescaledWater}ml
+                </p>
+              </div>
+              
+              <div>
+                <p className="mb-2 text-xs font-medium text-zinc-500">분쇄도</p>
+                <input
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-amber-400"
+                  value={grindInput}
+                  onChange={(e) => setGrindInput(e.target.value)}
+                  inputMode="decimal"
+                  placeholder={String(selectedRecipe.grindSize)}
+                />
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs font-medium text-zinc-500">물 온도 (°C)</p>
+                <input
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-amber-400"
+                  value={tempInput}
+                  onChange={(e) => setTempInput(e.target.value)}
+                  inputMode="decimal"
+                  placeholder={String(selectedRecipe.waterTemp)}
+                />
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs font-medium text-zinc-500">필터 종류</p>
+                <input
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-amber-400"
+                  value={filterInput}
+                  onChange={(e) => setFilterInput(e.target.value)}
+                  placeholder={selectedRecipe.filterType || "필터"}
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -247,16 +329,15 @@ export default function BrewPrepPage() {
       </div>
 
       {/* Recipe sheet */}
-      <BottomSheet isOpen={sheet === "recipe"} onClose={() => setSheet(null)} title="레시피 선택">
+      <BottomSheet 
+        isOpen={sheet === "recipe"} 
+        onClose={() => setSheet(null)} 
+        title="레시피 선택"
+        action={<button onClick={() => { setSheet(null); navigate("/recipe/new"); }} className="text-sm font-medium text-amber-400">+ 추가</button>}
+      >
         {recipes.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-zinc-500">레시피가 없어요</p>
-            <button
-              onClick={() => { setSheet(null); navigate("/recipe/new"); }}
-              className="mt-3 text-amber-400"
-            >
-              레시피 만들기 →
-            </button>
           </div>
         ) : (
           recipes.map((recipe) => (
@@ -271,29 +352,42 @@ export default function BrewPrepPage() {
       </BottomSheet>
 
       {/* Grinder sheet */}
-      <BottomSheet isOpen={sheet === "grinder"} onClose={() => setSheet(null)} title="그라인더 선택">
+      <BottomSheet 
+        isOpen={sheet === "grinder"} 
+        onClose={() => setSheet(null)} 
+        title="그라인더 선택"
+        action={<button onClick={() => { setSheet(null); setAddingEquipment("grinder"); }} className="text-sm font-medium text-amber-400">+ 추가</button>}
+      >
         <EquipmentSelectList
           items={equipment.filter((e) => e.type === "grinder")}
           selected={selectedGrinder}
           onSelect={(e) => { setSelectedGrinder(e); setSheet(null); }}
-          onAdd={() => { setSheet(null); setAddingEquipment("grinder"); }}
           emptyLabel="등록된 그라인더가 없어요"
         />
       </BottomSheet>
 
       {/* Dripper sheet */}
-      <BottomSheet isOpen={sheet === "dripper"} onClose={() => setSheet(null)} title="드리퍼 선택">
+      <BottomSheet 
+        isOpen={sheet === "dripper"} 
+        onClose={() => setSheet(null)} 
+        title="드리퍼 선택"
+        action={<button onClick={() => { setSheet(null); setAddingEquipment("dripper"); }} className="text-sm font-medium text-amber-400">+ 추가</button>}
+      >
         <EquipmentSelectList
           items={equipment.filter((e) => e.type === "dripper")}
           selected={selectedDripper}
           onSelect={(e) => { setSelectedDripper(e); setSheet(null); }}
-          onAdd={() => { setSheet(null); setAddingEquipment("dripper"); }}
           emptyLabel="등록된 드리퍼가 없어요"
         />
       </BottomSheet>
 
       {/* Other equipment sheet */}
-      <BottomSheet isOpen={sheet === "other"} onClose={() => setSheet(null)} title="기타장비 선택">
+      <BottomSheet 
+        isOpen={sheet === "other"} 
+        onClose={() => setSheet(null)} 
+        title="기타장비 선택"
+        action={<button onClick={() => { setSheet(null); setAddingEquipment("other"); }} className="text-sm font-medium text-amber-400">+ 추가</button>}
+      >
         <button
           className="mb-2 flex w-full items-center py-3 text-zinc-400"
           onClick={() => { setSelectedOtherEquipment(null); setSheet(null); }}
@@ -306,7 +400,6 @@ export default function BrewPrepPage() {
           items={equipment.filter((e) => e.type !== "grinder" && e.type !== "dripper")}
           selected={selectedOtherEquipment}
           onSelect={(e) => { setSelectedOtherEquipment(e); setSheet(null); }}
-          onAdd={() => { setSheet(null); setAddingEquipment("other"); }}
           emptyLabel="등록된 기타 장비가 없어요"
         />
       </BottomSheet>
@@ -402,19 +495,17 @@ function LastBrewTipsCard({ tips }: { tips: NextBrewTips }) {
 }
 
 function EquipmentSelectList({
-  items, selected, onSelect, onAdd, emptyLabel,
+  items, selected, onSelect, emptyLabel,
 }: {
   items: Equipment[];
   selected: Equipment | null;
   onSelect: (e: Equipment) => void;
-  onAdd: () => void;
   emptyLabel: string;
 }) {
   if (items.length === 0) {
     return (
       <div className="py-8 text-center">
         <p className="text-zinc-500">{emptyLabel}</p>
-        <button onClick={onAdd} className="mt-3 text-amber-400">장비 추가하기 →</button>
       </div>
     );
   }

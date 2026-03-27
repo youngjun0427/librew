@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBrewLogs } from "../../hooks/useBrewLogs";
+import { useRecipes } from "../../hooks/useRecipes";
 import { useBrewSessionStore } from "../../store/useBrewSessionStore";
 import type { NextBrewTips, SensoryNote } from "../../types";
 
@@ -52,8 +53,11 @@ function RatingRow({
 export default function BrewEvaluatePage() {
   const navigate = useNavigate();
   const { addBrewLog } = useBrewLogs();
-  const { selectedRecipe, selectedBean, usedCoffeeWeight, totalElapsed, reset } =
-    useBrewSessionStore();
+  const { updateRecipe } = useRecipes();
+  const { 
+    selectedRecipe, selectedBean, usedCoffeeWeight, totalElapsed,
+    actualGrindSize, actualWaterTemp, actualFilterType, reset 
+  } = useBrewSessionStore();
 
   const [ratings, setRatings] = useState<SensoryNote>({
     acidity: 3, bitterness: 3, body: 3, aroma: 3, overall: 3,
@@ -62,26 +66,48 @@ export default function BrewEvaluatePage() {
   const [tips, setTips] = useState<NextBrewTips>({});
   const [isSaving, setIsSaving] = useState(false);
 
-  const totalWater =
-    selectedRecipe?.steps.reduce((s, step) => s + step.waterAmount, 0) ??
-    selectedRecipe?.waterWeight ?? 0;
+  const recipeWater = selectedRecipe?.steps.reduce((s, step) => s + step.waterAmount, 0) ?? selectedRecipe?.waterWeight ?? 0;
+  
+  const rescaledWater = (selectedRecipe && selectedRecipe.coffeeWeight > 0 && usedCoffeeWeight > 0)
+    ? Math.round((recipeWater / selectedRecipe.coffeeWeight) * usedCoffeeWeight)
+    : recipeWater;
 
   const hasTips = Object.values(tips).some((v) => v && v.trim());
+  const hasOverrides = actualGrindSize !== null || actualWaterTemp !== null || actualFilterType !== null || usedCoffeeWeight !== selectedRecipe?.coffeeWeight;
 
   const handleSave = async () => {
     if (!selectedRecipe) return;
     setIsSaving(true);
     try {
-      await addBrewLog({
+      const logData: any = {
         recipeId: selectedRecipe.id,
         beanId: selectedBean?.id ?? null,
         usedCoffeeWeight,
-        actualWaterWeight: totalWater,
+        actualWaterWeight: rescaledWater,
         totalBrewTime: totalElapsed,
         sensoryNote: ratings,
         memo: memo.trim() || null,
-        nextBrewTips: hasTips ? tips : undefined,
-      });
+        nextBrewTips: hasTips ? tips : null,
+      };
+
+      if (actualGrindSize != null) logData.actualGrindSize = actualGrindSize;
+      if (actualWaterTemp != null) logData.actualWaterTemp = actualWaterTemp;
+      if (actualFilterType != null) logData.actualFilterType = actualFilterType;
+
+      await addBrewLog(logData);
+
+      if (hasOverrides && ratings.overall >= 4) {
+        if (window.confirm(`오늘 변경한 세팅이 만족스러우셨나요?\n이 세팅을 기존 '${selectedRecipe.title}'의 기본값으로 덮어쓸까요?`)) {
+          await updateRecipe(selectedRecipe.id, {
+            coffeeWeight: usedCoffeeWeight,
+            waterWeight: rescaledWater,
+            grindSize: actualGrindSize ?? selectedRecipe.grindSize,
+            waterTemp: actualWaterTemp ?? selectedRecipe.waterTemp,
+            filterType: actualFilterType ?? selectedRecipe.filterType,
+          });
+        }
+      }
+
       reset();
       navigate("/", { replace: true });
     } finally {
@@ -91,15 +117,22 @@ export default function BrewEvaluatePage() {
 
   const handleSkipEval = async () => {
     if (!selectedRecipe) { reset(); navigate("/", { replace: true }); return; }
-    await addBrewLog({
+    
+    const logData: any = {
       recipeId: selectedRecipe.id,
       beanId: selectedBean?.id ?? null,
       usedCoffeeWeight,
-      actualWaterWeight: totalWater,
+      actualWaterWeight: rescaledWater,
       totalBrewTime: totalElapsed,
       sensoryNote: null,
       memo: null,
-    });
+    };
+
+    if (actualGrindSize != null) logData.actualGrindSize = actualGrindSize;
+    if (actualWaterTemp != null) logData.actualWaterTemp = actualWaterTemp;
+    if (actualFilterType != null) logData.actualFilterType = actualFilterType;
+
+    await addBrewLog(logData);
     reset();
     navigate("/", { replace: true });
   };

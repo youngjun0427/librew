@@ -13,12 +13,14 @@ export interface Equipment {
 
 export interface EquipmentSpecs {
   clickUnit?: string;
+  currentGrindSetting?: string;
   capacity?: number;
   temperature?: number;
   filterType?: string;
   servings?: string;
   precision?: string;
   hasTimer?: boolean;
+  hasValve?: boolean;
 }
 
 export interface Recipe {
@@ -73,6 +75,9 @@ export interface BrewLog {
   beanId: string | null;
   usedCoffeeWeight: number;
   actualWaterWeight: number;
+  actualGrindSize?: number;
+  actualWaterTemp?: number;
+  actualFilterType?: string;
   totalBrewTime: number;
   sensoryNote: SensoryNote | null;
   memo: string | null;

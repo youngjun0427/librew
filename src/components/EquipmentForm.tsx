@@ -7,25 +7,28 @@ export type EquipmentFormValues = {
   brand: string;
   model: string;
   type: Equipment["type"];
-  clickUnit: string;
+  currentGrindSetting: string;
   capacity: string;
   temperature: string;
   filterType: string;
   servings: string;
   precision: string;
   hasTimer: boolean;
+  hasValve: boolean;
   notes: string;
 };
 
 export function buildEquipmentSpecs(data: EquipmentFormValues): EquipmentSpecs {
   const specs: EquipmentSpecs = {};
   if (data.type === "grinder") {
-    if (data.clickUnit) specs.clickUnit = data.clickUnit;
+    if (data.currentGrindSetting) specs.currentGrindSetting = data.currentGrindSetting;
   } else if (data.type === "kettle") {
     if (data.capacity) specs.capacity = Number(data.capacity);
     if (data.temperature) specs.temperature = Number(data.temperature);
   } else if (data.type === "dripper") {
     if (data.servings) specs.servings = data.servings;
+    if (data.hasValve !== undefined) specs.hasValve = data.hasValve;
+  }
   return specs;
 }
 
@@ -73,14 +76,15 @@ type Props = {
   submitLabel?: string;
   showBrandPicker?: boolean;
   lockedType?: Equipment["type"];
+  actions?: (isSubmitting: boolean, onSubmit: () => void) => React.ReactNode;
 };
 
-export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLabel = "저장", showBrandPicker = false, lockedType }: Props) {
+export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLabel = "저장", showBrandPicker = false, lockedType, actions }: Props) {
   const { control, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<EquipmentFormValues>({
     defaultValues: {
       brand: "", model: "", type: "grinder",
-      clickUnit: "", capacity: "", temperature: "", filterType: "",
-      servings: "", precision: "", hasTimer: false, notes: "",
+      currentGrindSetting: "", capacity: "", temperature: "", filterType: "",
+      servings: "", precision: "", hasTimer: false, hasValve: false, notes: "",
       ...defaultValues,
     },
   });
@@ -240,9 +244,9 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
         )}
 
         {type === "grinder" && (
-          <Field label="분쇄도 설정">
-            <Controller control={control} name="clickUnit" render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="예: #18 클릭 · Medium Fine" />
+          <Field label="현재 분쇄도 기록">
+            <Controller control={control} name="currentGrindSetting" render={({ field }) => (
+              <input {...field} className={inputClass} placeholder="예: 22클릭" />
             )} />
           </Field>
         )}
@@ -267,11 +271,23 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
         )}
 
         {type === "dripper" && (
-          <Field label="인원">
-            <Controller control={control} name="servings" render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="1~4인용" />
-            )} />
-          </Field>
+          <>
+            <Field label="인원">
+              <Controller control={control} name="servings" render={({ field }) => (
+                <input {...field} className={inputClass} placeholder="1~4인용" />
+              )} />
+            </Field>
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3">
+              <p className="text-sm font-medium text-white">스위치/밸브 유무 (침출형)</p>
+              <Controller
+                control={control}
+                name="hasValve"
+                render={({ field }) => (
+                  <Toggle value={field.value} onChange={field.onChange} />
+                )}
+              />
+            </div>
+          </>
         )}
 
 
@@ -285,13 +301,17 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
           />
         </Field>
 
-        <button
-          className={`w-full rounded-2xl py-4 font-bold text-zinc-900 ${isSubmitting ? "bg-amber-300" : "bg-amber-400"}`}
-          onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "저장 중..." : submitLabel}
-        </button>
+        {actions ? (
+          actions(isSubmitting, handleSubmit(onSubmit))
+        ) : (
+          <button
+            className={`w-full rounded-2xl py-4 font-bold text-zinc-900 ${isSubmitting ? "bg-amber-300" : "bg-amber-400"}`}
+            onClick={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "저장 중..." : submitLabel}
+          </button>
+        )}
       </div>
     </div>
   );

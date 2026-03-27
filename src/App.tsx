@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { lazy, Suspense, useEffect } from "react";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { GlobalDataProvider } from "./components/GlobalDataProvider";
 import { LoadingView } from "./components/LoadingView";
 import { auth } from "./lib/firebase";
 import { useAuthStore } from "./store/useAuthStore";
@@ -46,30 +47,32 @@ export default function App() {
 
   return (
     <HashRouter>
-      <Suspense fallback={<LoadingView />}>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<AuthGuard><HomePage /></AuthGuard>} />
-          <Route path="/recipe" element={<AuthGuard><RecipeListPage /></AuthGuard>} />
-          <Route path="/recipe/new" element={<AuthGuard><RecipeNewPage /></AuthGuard>} />
-          <Route path="/recipe/edit/:id" element={<AuthGuard><RecipeEditPage /></AuthGuard>} />
-          <Route path="/recipe/:id" element={<AuthGuard><RecipeDetailPage /></AuthGuard>} />
-          <Route path="/bean" element={<AuthGuard><BeanListPage /></AuthGuard>} />
-          <Route path="/bean/new" element={<AuthGuard><BeanNewPage /></AuthGuard>} />
-          <Route path="/bean/:id" element={<AuthGuard><BeanDetailPage /></AuthGuard>} />
-          <Route path="/equipment" element={<AuthGuard><EquipmentListPage /></AuthGuard>} />
-          <Route path="/equipment/new" element={<AuthGuard><EquipmentNewPage /></AuthGuard>} />
-          <Route path="/equipment/:id" element={<AuthGuard><EquipmentDetailPage /></AuthGuard>} />
-          <Route path="/brew/prep" element={<AuthGuard><BrewPrepPage /></AuthGuard>} />
-          <Route path="/brew/countdown" element={<AuthGuard><BrewCountdownPage /></AuthGuard>} />
-          <Route path="/brew/session" element={<AuthGuard><BrewSessionPage /></AuthGuard>} />
-          <Route path="/brew/complete" element={<AuthGuard><BrewCompletePage /></AuthGuard>} />
-          <Route path="/brew/evaluate" element={<AuthGuard><BrewEvaluatePage /></AuthGuard>} />
-          <Route path="/log" element={<AuthGuard><LogListPage /></AuthGuard>} />
-          <Route path="/log/:id" element={<AuthGuard><LogDetailPage /></AuthGuard>} />
-          <Route path="/mypage" element={<AuthGuard><MyPage /></AuthGuard>} />
-        </Routes>
-      </Suspense>
+      <GlobalDataProvider>
+        <Suspense fallback={<LoadingView />}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<AuthGuard><HomePage /></AuthGuard>} />
+            <Route path="/recipe" element={<AuthGuard><RecipeListPage /></AuthGuard>} />
+            <Route path="/recipe/new" element={<AuthGuard><RecipeNewPage /></AuthGuard>} />
+            <Route path="/recipe/edit/:id" element={<AuthGuard><RecipeEditPage /></AuthGuard>} />
+            <Route path="/recipe/:id" element={<AuthGuard><RecipeDetailPage /></AuthGuard>} />
+            <Route path="/bean" element={<AuthGuard><BeanListPage /></AuthGuard>} />
+            <Route path="/bean/new" element={<AuthGuard><BeanNewPage /></AuthGuard>} />
+            <Route path="/bean/:id" element={<AuthGuard><BeanDetailPage /></AuthGuard>} />
+            <Route path="/equipment" element={<AuthGuard><EquipmentListPage /></AuthGuard>} />
+            <Route path="/equipment/new" element={<AuthGuard><EquipmentNewPage /></AuthGuard>} />
+            <Route path="/equipment/:id" element={<AuthGuard><EquipmentDetailPage /></AuthGuard>} />
+            <Route path="/brew/prep" element={<AuthGuard><BrewPrepPage /></AuthGuard>} />
+            <Route path="/brew/countdown" element={<AuthGuard><BrewCountdownPage /></AuthGuard>} />
+            <Route path="/brew/session" element={<AuthGuard><BrewSessionPage /></AuthGuard>} />
+            <Route path="/brew/complete" element={<AuthGuard><BrewCompletePage /></AuthGuard>} />
+            <Route path="/brew/evaluate" element={<AuthGuard><BrewEvaluatePage /></AuthGuard>} />
+            <Route path="/log" element={<AuthGuard><LogListPage /></AuthGuard>} />
+            <Route path="/log/:id" element={<AuthGuard><LogDetailPage /></AuthGuard>} />
+            <Route path="/mypage" element={<AuthGuard><MyPage /></AuthGuard>} />
+          </Routes>
+        </Suspense>
+      </GlobalDataProvider>
     </HashRouter>
   );
 }

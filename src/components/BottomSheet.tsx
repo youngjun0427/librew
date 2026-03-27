@@ -4,10 +4,11 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export function BottomSheet({ isOpen, onClose, title, children }: Props) {
+export function BottomSheet({ isOpen, onClose, title, action, children }: Props) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -33,7 +34,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: Props) {
             </div>
             <div className="flex items-center justify-between px-5 pb-3 pt-1">
               <h2 className="text-lg font-bold text-white">{title}</h2>
-              <button onClick={onClose} className="text-zinc-400 text-sm">닫기</button>
+              {action && <div>{action}</div>}
             </div>
             <div className="overflow-y-auto px-5 pb-10">
               {children}

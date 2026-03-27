@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { BottomSheet } from "./BottomSheet";
 
 export type RecipeFormValues = {
   title: string;
@@ -46,9 +49,10 @@ export function RecipeForm({
   onBack,
   title,
   submitLabel = "저장",
-  dripperOptions,
-  grinderOptions,
+  dripperOptions = [],
+  grinderOptions = [],
 }: Props) {
+  const navigate = useNavigate();
   const {
     control,
     handleSubmit,
@@ -80,6 +84,8 @@ export function RecipeForm({
   const brewMethodValue = useWatch({ control, name: "brewMethod" });
   const grinderNameValue = useWatch({ control, name: "grinderName" });
 
+  const [sheet, setSheet] = useState<"dripper" | "grinder" | null>(null);
+
   return (
     <div className="min-h-screen bg-zinc-900">
       <div className="overflow-y-auto p-6 pt-14">
@@ -100,28 +106,21 @@ export function RecipeForm({
           />
         </Field>
 
-        <Field label="추출 도구">
-          {dripperOptions && dripperOptions.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2">
-              {dripperOptions.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => setValue("brewMethod", d)}
-                  className={`rounded-xl px-4 py-2 text-sm font-medium ${
-                    brewMethodValue === d ? "bg-amber-400 text-zinc-900" : "bg-zinc-700 text-zinc-300"
-                  }`}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-          )}
+        <Field label="추출 도구 (드리퍼)">
+          <div 
+            onClick={() => setSheet("dripper")}
+            className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
+          >
+            <span className={brewMethodValue ? "text-white" : "text-zinc-500"}>
+              {brewMethodValue || "내 장비에서 선택"}
+            </span>
+            <span className="text-amber-400 text-sm">선택</span>
+          </div>
           <Controller
             control={control}
             name="brewMethod"
             render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="드리퍼, 에어로프레스, 모카포트 등" />
+              <input {...field} className={inputClass} placeholder="직접 입력 (에어로프레스 등)" />
             )}
           />
         </Field>
@@ -137,27 +136,20 @@ export function RecipeForm({
         </Field>
 
         <Field label="그라인더">
-          {grinderOptions && grinderOptions.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2">
-              {grinderOptions.map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setValue("grinderName", grinderNameValue === g ? "" : g)}
-                  className={`rounded-xl px-4 py-2 text-sm font-medium ${
-                    grinderNameValue === g ? "bg-amber-400 text-zinc-900" : "bg-zinc-700 text-zinc-300"
-                  }`}
-                >
-                  {g}
-                </button>
-              ))}
-            </div>
-          )}
+          <div 
+            onClick={() => setSheet("grinder")}
+            className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
+          >
+            <span className={grinderNameValue ? "text-white" : "text-zinc-500"}>
+              {grinderNameValue || "내 장비에서 선택"}
+            </span>
+            <span className="text-amber-400 text-sm">선택</span>
+          </div>
           <Controller
             control={control}
             name="grinderName"
             render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="사용한 그라인더 (선택)" />
+              <input {...field} className={inputClass} placeholder="직접 입력 (선택)" />
             )}
           />
         </Field>
@@ -299,6 +291,74 @@ export function RecipeForm({
           {isSubmitting ? "저장 중..." : submitLabel}
         </button>
       </div>
+
+      <BottomSheet isOpen={sheet === "dripper"} onClose={() => setSheet(null)} title="추출 도구 선택">
+        <div className="mb-4 flex justify-between items-center px-1">
+          <p className="text-sm text-zinc-400">내 장비에서 선택</p>
+          <button onClick={() => navigate("/equipment/new")} className="text-sm text-amber-400">+ 추가하기</button>
+        </div>
+        {dripperOptions.length === 0 ? (
+          <div className="py-8 text-center text-zinc-500">
+            등록된 드리퍼가 없습니다
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {dripperOptions.map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => {
+                  setValue("brewMethod", d);
+                  setSheet(null);
+                }}
+                className={`w-full rounded-xl p-4 text-left font-medium transition-colors ${
+                  brewMethodValue === d ? "bg-amber-400/10 text-amber-400 ring-1 ring-amber-400" : "bg-zinc-800 text-white active:bg-zinc-700"
+                }`}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+        )}
+      </BottomSheet>
+
+      <BottomSheet isOpen={sheet === "grinder"} onClose={() => setSheet(null)} title="그라인더 선택">
+        <div className="mb-4 flex justify-between items-center px-1">
+          <p className="text-sm text-zinc-400">내 장비에서 선택</p>
+          <button onClick={() => navigate("/equipment/new")} className="text-sm text-amber-400">+ 추가하기</button>
+        </div>
+        <button
+          className="mb-2 flex w-full items-center py-3 text-zinc-400 active:bg-zinc-800"
+          onClick={() => { setValue("grinderName", ""); setSheet(null); }}
+        >
+          <span className="flex-1 text-left text-sm px-1">선택 안 함</span>
+          {!grinderNameValue && <span className="text-amber-400 text-sm">✓</span>}
+        </button>
+        <div className="mb-4 h-px bg-zinc-800" />
+        {grinderOptions.length === 0 ? (
+          <div className="py-8 text-center text-zinc-500">
+            등록된 그라인더가 없습니다
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {grinderOptions.map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => {
+                  setValue("grinderName", g);
+                  setSheet(null);
+                }}
+                className={`w-full rounded-xl p-4 text-left font-medium transition-colors ${
+                  grinderNameValue === g ? "bg-amber-400/10 text-amber-400 ring-1 ring-amber-400" : "bg-zinc-800 text-white active:bg-zinc-700"
+                }`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        )}
+      </BottomSheet>
     </div>
   );
 }

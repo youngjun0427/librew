@@ -14,7 +14,7 @@ export function Toggle({ value, onChange }: Props) {
     >
       <span
         className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${
-          value ? "translate-x-6" : "translate-x-1"
+          value ? "translate-x-1" : "translate-x-[-1.1rem]"
         }`}
       />
     </button>

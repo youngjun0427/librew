@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { lazy, Suspense, useEffect } from "react";
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BottomNav } from "./components/BottomNav";
 import { GlobalDataProvider } from "./components/GlobalDataProvider";
 import { LoadingView } from "./components/LoadingView";
 import { auth } from "./lib/firebase";
@@ -34,6 +35,14 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AppBottomNav() {
+  const { user, isLoading } = useAuthStore();
+  const location = useLocation();
+  if (isLoading || !user) return null;
+  if (location.pathname.startsWith("/brew") || location.pathname === "/login") return null;
+  return <BottomNav />;
+}
+
 export default function App() {
   const { setUser, setLoading } = useAuthStore();
 
@@ -49,7 +58,8 @@ export default function App() {
     <HashRouter>
       <GlobalDataProvider>
         <Suspense fallback={<LoadingView />}>
-          <Routes>
+          <div className="pb-16">
+            <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<AuthGuard><HomePage /></AuthGuard>} />
             <Route path="/recipe" element={<AuthGuard><RecipeListPage /></AuthGuard>} />
@@ -71,6 +81,8 @@ export default function App() {
             <Route path="/log/:id" element={<AuthGuard><LogDetailPage /></AuthGuard>} />
             <Route path="/mypage" element={<AuthGuard><MyPage /></AuthGuard>} />
           </Routes>
+          </div>
+          <AppBottomNav />
         </Suspense>
       </GlobalDataProvider>
     </HashRouter>

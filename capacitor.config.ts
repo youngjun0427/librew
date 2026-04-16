@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.coffeebrewlog.app",
-  appName: "Coffee Brew Log",
+  appId: "com.librew.app",
+  appName: "Librew",
   webDir: "dist",
 };
 

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Coffee Brew Log",
-    "slug": "coffee-brew-log",
+    "name": "Librew",
+    "slug": "librew",
     "scheme": "brewlog",
     "version": "1.0.0",
     "orientation": "portrait",

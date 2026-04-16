@@ -29,7 +29,7 @@ export function TopBar() {
         </button>
       )}
 
-      <h1 className="text-base font-bold text-white">{isHome ? "BrewNote" : ""}</h1>
+      <h1 className="text-base font-bold text-white">{isHome ? "Librew" : ""}</h1>
 
       {isHome && (
         <button

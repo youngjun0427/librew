@@ -1,7 +1,6 @@
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuthStore } from "../store/useAuthStore";
-import { TopBar } from "../components/TopBar";
 
 export default function MyPage() {
   const { user } = useAuthStore();
@@ -14,7 +13,9 @@ export default function MyPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-900">
-      <TopBar />
+      <div className="px-5 pb-2 pt-14">
+        <h1 className="text-lg font-bold text-white">설정</h1>
+      </div>
 
       <div className="flex-1 px-4 pt-2 space-y-3">
         <div className="rounded-2xl bg-zinc-800 px-4 py-4">

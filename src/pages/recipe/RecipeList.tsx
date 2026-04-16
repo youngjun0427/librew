@@ -32,9 +32,11 @@ export default function RecipeListPage() {
 
   return (
     <div className="min-h-screen bg-zinc-900">
-      <div className="flex items-center justify-between px-5 pb-4 pt-14">
-        <button onClick={() => navigate(-1)} className="text-amber-400">← 뒤로</button>
-        <h1 className="text-lg font-bold text-white">레시피</h1>
+      <div className="flex items-center justify-between px-5 pb-2 pt-14">
+        <div>
+          <h1 className="text-lg font-bold text-white">레시피</h1>
+          <p className="text-xs text-zinc-500">My Library</p>
+        </div>
         <button onClick={() => navigate("/recipe/new")} className="text-amber-400">+ 추가</button>
       </div>
 

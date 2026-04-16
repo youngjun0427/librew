@@ -34,6 +34,7 @@ export default function ShareViewerPage() {
       waterTemp: r.waterTemp,
       coffeeWeight: r.coffeeWeight,
       waterWeight: r.waterWeight,
+      grinderName: r.grinderName ?? null,
       steps: r.steps,
       isPublic: false,
       shareId: null,

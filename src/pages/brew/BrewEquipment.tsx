@@ -5,18 +5,15 @@ import { useEquipment } from "../../hooks/useEquipment";
 import type { Equipment } from "../../types";
 
 const EQUIPMENT_ICONS: Record<Equipment["type"], string> = {
-  grinder: "⚙️", kettle: "🫖", dripper: "☕", scale: "⚖️", other: "🔧",
+  grinder: "⚙️", dripper: "☕", scale: "⚖️", other: "🔧",
 };
 const EQUIPMENT_TYPE_LABELS: Record<Equipment["type"], string> = {
-  grinder: "그라인더", kettle: "케틀", dripper: "드리퍼", scale: "저울", other: "기타",
+  grinder: "그라인더", dripper: "드리퍼", scale: "저울", other: "기타",
 };
 
 function getSubtitle(item: Equipment): string {
   const s = item.specs;
   if (item.type === "grinder") return s.clickUnit ?? "";
-  if (item.type === "kettle")
-    return [s.temperature ? `${s.temperature}°C` : "", s.capacity ? `${s.capacity}L` : ""]
-      .filter(Boolean).join(" · ");
   if (item.type === "dripper") return [s.filterType, s.servings].filter(Boolean).join(" · ");
   if (item.type === "scale")
     return [s.precision ? `${s.precision} 단위` : "", s.hasTimer ? "타이머 내장" : ""]

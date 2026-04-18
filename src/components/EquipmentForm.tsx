@@ -10,8 +10,6 @@ export type EquipmentFormValues = {
   model: string;
   type: Equipment["type"];
   currentGrindSetting: string;
-  capacity: string;
-  temperature: string;
   filterType: string;
   servings: string;
   precision: string;
@@ -23,9 +21,6 @@ export function buildEquipmentSpecs(data: EquipmentFormValues): EquipmentSpecs {
   const specs: EquipmentSpecs = {};
   if (data.type === "grinder") {
     if (data.currentGrindSetting) specs.currentGrindSetting = data.currentGrindSetting;
-  } else if (data.type === "kettle") {
-    if (data.capacity) specs.capacity = Number(data.capacity);
-    if (data.temperature) specs.temperature = Number(data.temperature);
   } else if (data.type === "dripper") {
     if (data.servings) specs.servings = data.servings;
   }
@@ -57,7 +52,6 @@ const GRINDER_BRANDS: { brand: string; models: string[] }[] = [
 
 const TYPES: { value: Equipment["type"]; label: string }[] = [
   { value: "grinder", label: "그라인더" },
-  { value: "kettle", label: "케틀" },
   { value: "dripper", label: "드리퍼" },
   { value: "other", label: "기타" },
 ];
@@ -107,8 +101,6 @@ export function EquipmentForm({
       model: "",
       type: "grinder",
       currentGrindSetting: "",
-      capacity: "",
-      temperature: "",
       filterType: "",
       servings: "",
       precision: "",
@@ -123,18 +115,12 @@ export function EquipmentForm({
 
   // 그라인더 브랜드 피커 상태
   const [pickerBrand, setPickerBrand] = useState<string | null>(defaultValues?.brand ?? null);
-  const isCustomBrand = pickerBrand === "기타";
   const selectedBrandData = GRINDER_BRANDS.find((b) => b.brand === pickerBrand);
 
   const handleBrandSelect = (b: string) => {
     setPickerBrand(b);
-    if (b !== "기타") {
-      setValue("brand", b);
-      setValue("model", "");
-    } else {
-      setValue("brand", "");
-      setValue("model", "");
-    }
+    setValue("brand", b);
+    setValue("model", "");
   };
 
   const handleModelSelect = (m: string) => {
@@ -186,9 +172,9 @@ export function EquipmentForm({
         )}
 
         {/* 그라인더 브랜드 피커 */}
-        {showPicker ? (
+        {showPicker && (
           <>
-            <Field label="브랜드">
+            <Field label="자주 쓰는 브랜드">
               <div className="grid grid-cols-3 gap-2">
                 {GRINDER_BRANDS.map((b) => (
                   <button
@@ -204,21 +190,12 @@ export function EquipmentForm({
                     {b.brand}
                   </button>
                 ))}
-                <button
-                  type="button"
-                  onClick={() => handleBrandSelect("기타")}
-                  className={`rounded-xl py-3 text-sm font-medium ${
-                    isCustomBrand ? "bg-amber-400 text-zinc-900" : "bg-zinc-800 text-zinc-300"
-                  }`}
-                >
-                  기타
-                </button>
               </div>
             </Field>
 
             {/* 모델 선택 */}
-            {selectedBrandData && !isCustomBrand && (
-              <Field label="모델">
+            {selectedBrandData && (
+              <Field label="모델 선택">
                 <div className="flex flex-wrap gap-2">
                   {selectedBrandData.models.map((m) => (
                     <button
@@ -235,65 +212,37 @@ export function EquipmentForm({
                 </div>
               </Field>
             )}
-
-            {/* 기타 직접 입력 */}
-            {isCustomBrand && (
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <Field label="브랜드 직접 입력">
-                    <Controller
-                      control={control}
-                      name="brand"
-                      render={({ field }) => (
-                        <input {...field} className={inputClass} placeholder="브랜드명" />
-                      )}
-                    />
-                  </Field>
-                </div>
-                <div className="flex-1">
-                  <Field label="모델명 직접 입력">
-                    <Controller
-                      control={control}
-                      name="model"
-                      render={({ field }) => (
-                        <input {...field} className={inputClass} placeholder="모델명" />
-                      )}
-                    />
-                  </Field>
-                </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {type === "dripper" && <InfoBox>스위치 여부는 레시피에서 적용할 수 있어요.</InfoBox>}
-            {/* 그라인더 외 or 편집 모드 */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <Field label="브랜드">
-                  <Controller
-                    control={control}
-                    name="brand"
-                    render={({ field }) => (
-                      <input {...field} className={inputClass} placeholder="예: Comandante" />
-                    )}
-                  />
-                </Field>
-              </div>
-              <div className="flex-1">
-                <Field label="모델명">
-                  <Controller
-                    control={control}
-                    name="model"
-                    render={({ field }) => (
-                      <input {...field} className={inputClass} placeholder="예: C40 MK4" />
-                    )}
-                  />
-                </Field>
-              </div>
-            </div>
           </>
         )}
+
+        {type === "dripper" && (
+          <InfoBox>스위치 여부는 레시피 설정 시 반영할 수 있어요.</InfoBox>
+        )}
+
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <Field label={type === "dripper" ? "브랜드" : "브랜드 *"}>
+              <Controller
+                control={control}
+                name="brand"
+                render={({ field }) => (
+                  <input {...field} className={inputClass} placeholder="예: Comandante" />
+                )}
+              />
+            </Field>
+          </div>
+          <div className="flex-1">
+            <Field label="모델명 *">
+              <Controller
+                control={control}
+                name="model"
+                render={({ field }) => (
+                  <input {...field} className={inputClass} placeholder="예: C40 MK4" />
+                )}
+              />
+            </Field>
+          </div>
+        </div>
 
         {type === "grinder" && (
           <Field label="기준 분쇄도">
@@ -307,36 +256,9 @@ export function EquipmentForm({
           </Field>
         )}
 
-        {type === "kettle" && (
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Field label="온도">
-                <Controller
-                  control={control}
-                  name="temperature"
-                  render={({ field }) => (
-                    <UnitInput {...field} type="numeric" unit="°C" placeholder="93" />
-                  )}
-                />
-              </Field>
-            </div>
-            <div className="flex-1">
-              <Field label="용량">
-                <Controller
-                  control={control}
-                  name="capacity"
-                  render={({ field }) => (
-                    <UnitInput {...field} type="numeric" unit="L" placeholder="0.9" />
-                  )}
-                />
-              </Field>
-            </div>
-          </div>
-        )}
-
         {type === "dripper" && (
           <>
-            <Field label="사이즈 (선택)">
+            <Field label="사이즈">
               <Controller
                 control={control}
                 name="servings"
@@ -359,7 +281,7 @@ export function EquipmentForm({
           </>
         )}
 
-        <Field label="메모 (선택)">
+        <Field label="메모">
           <Controller
             control={control}
             name="notes"

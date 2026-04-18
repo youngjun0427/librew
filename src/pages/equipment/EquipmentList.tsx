@@ -7,7 +7,6 @@ import type { Equipment } from "../../types";
 
 const TYPE_ICONS: Record<Equipment["type"], string> = {
   grinder: "⚙️",
-  kettle: "🫖",
   dripper: "☕",
   scale: "⚖️",
   other: "🔧",

@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   base: "/brew_note/",
   server: {
+    host: true,
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
     },

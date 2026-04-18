@@ -1,13 +1,6 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  ResponsiveContainer,
-  Tooltip,
-  Cell,
-} from "recharts";
+import { BarChart, Bar, XAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { ErrorView } from "../components/ErrorView";
 import { LoadingView } from "../components/LoadingView";
 import { useBrewLogs } from "../hooks/useBrewLogs";
@@ -67,10 +60,7 @@ function RecentLogItem({
   const overall = log.sensoryNote?.overall;
 
   return (
-    <button
-      onClick={onPress}
-      className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
-    >
+    <button onClick={onPress} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-zinc-700">
         <span className="text-base">☕</span>
       </div>
@@ -79,7 +69,8 @@ function RecentLogItem({
         <div className="mt-0.5 flex items-center gap-2">
           {overall ? (
             <span className="text-xs text-amber-400">
-              {"★".repeat(overall)}{"☆".repeat(5 - overall)}
+              {"★".repeat(overall)}
+              {"☆".repeat(5 - overall)}
             </span>
           ) : null}
           <span className="text-xs text-zinc-500">{date}</span>
@@ -105,9 +96,7 @@ export default function HomePage() {
     return brewLogs.filter((l) => {
       if (!l.brewedAt) return false;
       const d = new Date(l.brewedAt.seconds * 1000);
-      return (
-        d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-      );
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     }).length;
   }, [brewLogs]);
 
@@ -164,13 +153,13 @@ export default function HomePage() {
           <StatCard
             label="평균 만족도"
             value={avgOverall ? `★ ${avgOverall}` : "-"}
-            sub={avgOverall ? `${brewLogs.filter((l) => l.sensoryNote?.overall).length}회 평가` : "아직 평가 없음"}
+            sub={
+              avgOverall
+                ? `${brewLogs.filter((l) => l.sensoryNote?.overall).length}회 평가`
+                : "아직 평가 없음"
+            }
           />
-          <StatCard
-            label="레시피"
-            value={`${recipes.length}개`}
-            sub="My Library"
-          />
+          <StatCard label="레시피" value={`${recipes.length}개`} />
         </div>
 
         {/* Weekly chart */}
@@ -182,7 +171,11 @@ export default function HomePage() {
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={120}>
-              <BarChart data={weeklyData} barSize={18} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
+              <BarChart
+                data={weeklyData}
+                barSize={18}
+                margin={{ top: 4, right: 0, left: -20, bottom: 0 }}
+              >
                 <XAxis
                   dataKey="week"
                   tick={{ fontSize: 9, fill: "#52525b" }}
@@ -202,10 +195,7 @@ export default function HomePage() {
                 />
                 <Bar dataKey="추출" radius={[3, 3, 0, 0]}>
                   {weeklyData.map((entry, index) => (
-                    <Cell
-                      key={index}
-                      fill={entry.추출 > 0 ? "#f59e0b" : "#3f3f46"}
-                    />
+                    <Cell key={index} fill={entry.추출 > 0 ? "#f59e0b" : "#3f3f46"} />
                   ))}
                 </Bar>
               </BarChart>
@@ -217,10 +207,7 @@ export default function HomePage() {
         <div className="rounded-2xl bg-zinc-800 overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-4 pb-2">
             <p className="text-sm font-semibold text-white">최근 Brew Log</p>
-            <button
-              onClick={() => navigate("/log")}
-              className="text-sm text-amber-400"
-            >
+            <button onClick={() => navigate("/log")} className="text-sm text-amber-400">
               전체 ›
             </button>
           </div>

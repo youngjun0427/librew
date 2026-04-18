@@ -22,7 +22,7 @@ export function BottomSheet({ isOpen, onClose, title, action, children }: Props)
             onClick={onClose}
           />
           <motion.div
-            className="fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-3xl bg-zinc-900"
+            className="fixed bottom-0 left-0 right-0 z-[60] flex flex-col rounded-t-3xl bg-zinc-900"
             style={{ maxHeight: "80vh" }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
@@ -36,9 +36,7 @@ export function BottomSheet({ isOpen, onClose, title, action, children }: Props)
               <h2 className="text-lg font-bold text-white">{title}</h2>
               {action && <div>{action}</div>}
             </div>
-            <div className="overflow-y-auto px-5 pb-10">
-              {children}
-            </div>
+            <div className="overflow-y-auto px-5 pt-3 pb-8">{children}</div>
           </motion.div>
         </>
       )}

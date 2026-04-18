@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ErrorView } from "../../components/ErrorView";
+import { InputDialog } from "../../components/InputDialog";
 import { LoadingView } from "../../components/LoadingView";
 import { useEquipment } from "../../hooks/useEquipment";
 import type { Equipment } from "../../types";
@@ -57,7 +58,7 @@ function EquipmentCard({
               e.stopPropagation();
               onUpdateGrindSetting(item.id, item.specs.currentGrindSetting || "");
             }}
-            className="rounded-lg bg-zinc-900/50 px-3 py-1.5 text-right transition-colors hover:bg-zinc-700"
+            className="rounded-lg bg-zinc-900/50 px-3 py-1.5 text-right transition-colors active:bg-zinc-700"
           >
             <span className="text-sm font-bold text-amber-400">
               {item.specs.currentGrindSetting}
@@ -80,19 +81,21 @@ export default function EquipmentListPage() {
   const { equipment, isLoading, error, updateEquipment } = useEquipment();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("grinder");
+  const [grindDialog, setGrindDialog] = useState<{ id: string; value: string } | null>(null);
 
-  const handleUpdateGrindSetting = async (id: string, currentVal: string) => {
-    const newVal = window.prompt(
-      "현재 분쇄도를 입력하세요 (예: 18클릭, 2.5.2)\n삭제하려면 빈 칸으로 확인을 누르세요.",
-      currentVal
-    );
-    if (newVal !== null) {
-      const equip = equipment.find((e) => e.id === id);
-      if (equip) {
-        await updateEquipment(id, {
-          specs: { ...equip.specs, currentGrindSetting: newVal.trim() || undefined },
-        });
-      }
+  const handleUpdateGrindSetting = (id: string, currentVal: string) => {
+    setGrindDialog({ id, value: currentVal });
+  };
+
+  const handleGrindConfirm = async (newVal: string) => {
+    if (!grindDialog) return;
+    const { id } = grindDialog;
+    setGrindDialog(null);
+    const equip = equipment.find((e) => e.id === id);
+    if (equip) {
+      await updateEquipment(id, {
+        specs: { ...equip.specs, currentGrindSetting: newVal.trim() || undefined },
+      });
     }
   };
 
@@ -148,6 +151,16 @@ export default function EquipmentListPage() {
           </div>
         )}
       </div>
+
+      <InputDialog
+        isOpen={grindDialog !== null}
+        title="기준 분쇄도"
+        description="빈 칸으로 확인하면 삭제돼요"
+        defaultValue={grindDialog?.value ?? ""}
+        placeholder="예: 18클릭, 2.5"
+        onConfirm={handleGrindConfirm}
+        onClose={() => setGrindDialog(null)}
+      />
     </div>
   );
 }

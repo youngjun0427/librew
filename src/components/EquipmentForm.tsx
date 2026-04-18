@@ -221,7 +221,7 @@ export function EquipmentForm({
 
         <div className="flex gap-3">
           <div className="flex-1">
-            <Field label={type === "dripper" ? "브랜드" : "브랜드 *"}>
+            <Field label="브랜드">
               <Controller
                 control={control}
                 name="brand"

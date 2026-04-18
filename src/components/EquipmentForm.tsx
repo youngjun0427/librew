@@ -3,6 +3,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Toggle } from "./Toggle";
 import type { Equipment, EquipmentSpecs } from "../types";
 import { UnitInput } from "./UnitInput";
+import { BottomSheetSelect } from "./BottomSheetSelect";
 
 export type EquipmentFormValues = {
   brand: string;
@@ -339,20 +340,19 @@ export function EquipmentForm({
               <Controller
                 control={control}
                 name="servings"
-                render={({ field }) => (
-                  <div className="relative">
-                    <select {...field} className={`${inputClass} appearance-none pr-10`}>
-                      <option value="">선택 안 함</option>
-                      <option value="1인용">1인용</option>
-                      <option value="2인용">2인용</option>
-                      <option value="4인용">4인용</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-500">
-                      <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                      </svg>
-                    </div>
-                  </div>
+                render={({ field: { value, onChange } }) => (
+                  <BottomSheetSelect
+                    title="드리퍼 사이즈"
+                    value={value}
+                    onChange={onChange}
+                    placeholder="선택 안 함"
+                    options={[
+                      { label: "선택 안 함", value: "" },
+                      { label: "1인용", value: "1인용" },
+                      { label: "2인용", value: "2인용" },
+                      { label: "4인용", value: "4인용" },
+                    ]}
+                  />
                 )}
               />
             </Field>

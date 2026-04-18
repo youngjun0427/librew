@@ -21,12 +21,12 @@ export default function BrewBeanPage() {
     const val = adjusted > 0 ? adjusted : target;
     setCoffeeInput(String(val));
     setUsedCoffeeWeight(val);
-  }, [selectedBean?.id]);
+  }, [selectedBean, selectedRecipe?.coffeeWeight, setUsedCoffeeWeight]);
 
   useEffect(() => {
     const n = Number(coffeeInput);
     if (!isNaN(n)) setUsedCoffeeWeight(n);
-  }, [coffeeInput]);
+  }, [coffeeInput, setUsedCoffeeWeight]);
 
   if (isLoading) return <LoadingView />;
   if (error) return <ErrorView message={error} />;

@@ -52,7 +52,7 @@ export default function App() {
       setLoading(false);
     });
     return unsubscribe;
-  }, []);
+  }, [setUser, setLoading]);
 
   return (
     <HashRouter>

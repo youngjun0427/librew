@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && user) navigate("/", { replace: true });
-  }, [user, isLoading]);
+  }, [user, isLoading, navigate]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-900">

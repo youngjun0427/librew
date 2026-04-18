@@ -51,8 +51,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubBeans = onSnapshot(
       query(collection(db, "users", user.uid, "beans")),
       (snap) => {
-        const items = snap.docs.map((d) => parseBean(d.id, d.data())).filter(Boolean) as any[];
-        setBeans(items.sort((a, b) => (b.purchasedAt?.seconds ?? 0) - (a.purchasedAt?.seconds ?? 0)));
+        const items = snap.docs.map((d) => parseBean(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseBean>[];
+        setBeans(items.sort((a, b) => (b?.purchasedAt?.seconds ?? 0) - (a?.purchasedAt?.seconds ?? 0)) as ReturnType<typeof parseBean>[]);
         setBeansLoading(false);
         setBeansInitialized(true);
       },
@@ -62,8 +62,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubRecipes = onSnapshot(
       query(collection(db, "users", user.uid, "recipes")),
       (snap) => {
-        const items = snap.docs.map((d) => parseRecipe(d.id, d.data())).filter(Boolean) as any[];
-        setRecipes(items.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)));
+        const items = snap.docs.map((d) => parseRecipe(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseRecipe>[];
+        setRecipes(items.sort((a, b) => (b?.createdAt?.seconds ?? 0) - (a?.createdAt?.seconds ?? 0)) as ReturnType<typeof parseRecipe>[]);
         setRecipesLoading(false);
         setRecipesInitialized(true);
       },
@@ -73,8 +73,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubEquipment = onSnapshot(
       query(collection(db, "users", user.uid, "equipment")),
       (snap) => {
-        const items = snap.docs.map((d) => parseEquipment(d.id, d.data())).filter(Boolean) as any[];
-        setEquipment(items.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)));
+        const items = snap.docs.map((d) => parseEquipment(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseEquipment>[];
+        setEquipment(items.sort((a, b) => (b?.createdAt?.seconds ?? 0) - (a?.createdAt?.seconds ?? 0)) as ReturnType<typeof parseEquipment>[]);
         setEquipmentLoading(false);
         setEquipmentInitialized(true);
       },
@@ -84,8 +84,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubBrewLogs = onSnapshot(
       query(collection(db, "users", user.uid, "brewLogs")),
       (snap) => {
-        const items = snap.docs.map((d) => parseBrewLog(d.id, d.data())).filter(Boolean) as any[];
-        setBrewLogs(items.sort((a, b) => (b.brewedAt?.seconds ?? 0) - (a.brewedAt?.seconds ?? 0)));
+        const items = snap.docs.map((d) => parseBrewLog(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseBrewLog>[];
+        setBrewLogs(items.sort((a, b) => (b?.brewedAt?.seconds ?? 0) - (a?.brewedAt?.seconds ?? 0)) as ReturnType<typeof parseBrewLog>[]);
         setBrewLogsLoading(false);
         setBrewLogsInitialized(true);
       },
@@ -98,7 +98,29 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
       unsubEquipment();
       unsubBrewLogs();
     };
-  }, [user]);
+  }, [
+    user,
+    resetBeans,
+    resetRecipes,
+    resetEquipment,
+    resetBrewLogs,
+    setBeans,
+    setBeansLoading,
+    setBeansError,
+    setBeansInitialized,
+    setRecipes,
+    setRecipesLoading,
+    setRecipesError,
+    setRecipesInitialized,
+    setEquipment,
+    setEquipmentLoading,
+    setEquipmentError,
+    setEquipmentInitialized,
+    setBrewLogs,
+    setBrewLogsLoading,
+    setBrewLogsError,
+    setBrewLogsInitialized,
+  ]);
 
   return <>{children}</>;
 }

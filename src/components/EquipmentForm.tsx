@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Toggle } from "./Toggle";
 import type { Equipment, EquipmentSpecs } from "../types";
+import { UnitInput } from "./UnitInput";
 
 export type EquipmentFormValues = {
   brand: string;
@@ -34,10 +35,16 @@ export function buildEquipmentSpecs(data: EquipmentFormValues): EquipmentSpecs {
 
 const GRINDER_BRANDS: { brand: string; models: string[] }[] = [
   { brand: "Comandante", models: ["C40 MK3", "C40 MK4", "C60 Baracuda"] },
-  { brand: "1Zpresso", models: ["ZP6 Special", "K-Ultra", "K-Max", "K-Plus", "J-Max", "JX-Pro", "Q2"] },
+  {
+    brand: "1Zpresso",
+    models: ["ZP6 Special", "K-Ultra", "K-Max", "K-Plus", "J-Max", "JX-Pro", "Q2"],
+  },
   { brand: "Fellow", models: ["Ode Gen 1", "Ode Gen 2", "Opus"] },
   { brand: "Kinu", models: ["M47 Classic", "M47 Phoenix", "M47 Simplicity"] },
-  { brand: "Timemore", models: ["Chestnut C2", "Chestnut C3", "Slim", "Nano", "Sculptor 078", "Sculptor 064"] },
+  {
+    brand: "Timemore",
+    models: ["Chestnut C2", "Chestnut C3", "Slim", "Nano", "Sculptor 078", "Sculptor 064"],
+  },
   { brand: "Baratza", models: ["Encore", "Virtuoso+", "Vario-W+", "Forte BG"] },
   { brand: "Wilfa", models: ["Svart Aroma", "Uniform"] },
   { brand: "Mahlkönig", models: ["EK43", "EK43 S", "X54"] },
@@ -79,12 +86,36 @@ type Props = {
   actions?: (isSubmitting: boolean, onSubmit: () => void) => React.ReactNode;
 };
 
-export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLabel = "저장", showBrandPicker = false, lockedType, actions }: Props) {
-  const { control, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<EquipmentFormValues>({
+export function EquipmentForm({
+  defaultValues,
+  onSubmit,
+  onBack,
+  title,
+  submitLabel = "저장",
+  showBrandPicker = false,
+  lockedType,
+  actions,
+}: Props) {
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isSubmitting },
+  } = useForm<EquipmentFormValues>({
     defaultValues: {
-      brand: "", model: "", type: "grinder",
-      currentGrindSetting: "", capacity: "", temperature: "", filterType: "",
-      servings: "", precision: "", hasTimer: false, hasValve: false, notes: "",
+      brand: "",
+      model: "",
+      type: "grinder",
+      currentGrindSetting: "",
+      capacity: "",
+      temperature: "",
+      filterType: "",
+      servings: "",
+      precision: "",
+      hasTimer: false,
+      hasValve: false,
+      notes: "",
       ...defaultValues,
     },
   });
@@ -118,7 +149,9 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
     <div className="min-h-screen bg-zinc-900">
       <div className="overflow-y-auto p-6 pt-14">
         <div className="mb-6 flex items-center">
-          <button onClick={onBack} className="text-amber-400">← 뒤로</button>
+          <button onClick={onBack} className="text-amber-400">
+            ← 뒤로
+          </button>
           <h1 className="ml-4 text-xl font-bold text-white">{title}</h1>
         </div>
 
@@ -140,7 +173,9 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
                         setValue("model", "");
                       }}
                       className={`rounded-xl px-4 py-2 text-sm font-medium ${
-                        value === t.value ? "bg-amber-400 text-zinc-900" : "bg-zinc-700 text-zinc-300"
+                        value === t.value
+                          ? "bg-amber-400 text-zinc-900"
+                          : "bg-zinc-700 text-zinc-300"
                       }`}
                     >
                       {t.label}
@@ -208,16 +243,24 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
               <div className="flex gap-3">
                 <div className="flex-1">
                   <Field label="브랜드 직접 입력">
-                    <Controller control={control} name="brand" render={({ field }) => (
-                      <input {...field} className={inputClass} placeholder="브랜드명" />
-                    )} />
+                    <Controller
+                      control={control}
+                      name="brand"
+                      render={({ field }) => (
+                        <input {...field} className={inputClass} placeholder="브랜드명" />
+                      )}
+                    />
                   </Field>
                 </div>
                 <div className="flex-1">
                   <Field label="모델명 직접 입력">
-                    <Controller control={control} name="model" render={({ field }) => (
-                      <input {...field} className={inputClass} placeholder="모델명" />
-                    )} />
+                    <Controller
+                      control={control}
+                      name="model"
+                      render={({ field }) => (
+                        <input {...field} className={inputClass} placeholder="모델명" />
+                      )}
+                    />
                   </Field>
                 </div>
               </div>
@@ -228,43 +271,63 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
           <div className="flex gap-3">
             <div className="flex-1">
               <Field label="브랜드">
-                <Controller control={control} name="brand" render={({ field }) => (
-                  <input {...field} className={inputClass} placeholder="예: Comandante" />
-                )} />
+                <Controller
+                  control={control}
+                  name="brand"
+                  render={({ field }) => (
+                    <input {...field} className={inputClass} placeholder="예: Comandante" />
+                  )}
+                />
               </Field>
             </div>
             <div className="flex-1">
               <Field label="모델명">
-                <Controller control={control} name="model" render={({ field }) => (
-                  <input {...field} className={inputClass} placeholder="예: C40 MK4" />
-                )} />
+                <Controller
+                  control={control}
+                  name="model"
+                  render={({ field }) => (
+                    <input {...field} className={inputClass} placeholder="예: C40 MK4" />
+                  )}
+                />
               </Field>
             </div>
           </div>
         )}
 
         {type === "grinder" && (
-          <Field label="현재 분쇄도 기록">
-            <Controller control={control} name="currentGrindSetting" render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="예: 22클릭" />
-            )} />
+          <Field label="기준 분쇄도">
+            <Controller
+              control={control}
+              name="currentGrindSetting"
+              render={({ field }) => (
+                <UnitInput {...field} type="numeric" unit="클릭" placeholder="예: 18" />
+              )}
+            />
           </Field>
         )}
 
         {type === "kettle" && (
           <div className="flex gap-3">
             <div className="flex-1">
-              <Field label="온도 (°C)">
-                <Controller control={control} name="temperature" render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" placeholder="93" />
-                )} />
+              <Field label="온도">
+                <Controller
+                  control={control}
+                  name="temperature"
+                  render={({ field }) => (
+                    <UnitInput {...field} type="numeric" unit="°C" placeholder="93" />
+                  )}
+                />
               </Field>
             </div>
             <div className="flex-1">
-              <Field label="용량 (L)">
-                <Controller control={control} name="capacity" render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" placeholder="0.9" />
-                )} />
+              <Field label="용량">
+                <Controller
+                  control={control}
+                  name="capacity"
+                  render={({ field }) => (
+                    <UnitInput {...field} type="numeric" unit="L" placeholder="0.9" />
+                  )}
+                />
               </Field>
             </div>
           </div>
@@ -273,23 +336,24 @@ export function EquipmentForm({ defaultValues, onSubmit, onBack, title, submitLa
         {type === "dripper" && (
           <>
             <Field label="인원">
-              <Controller control={control} name="servings" render={({ field }) => (
-                <input {...field} className={inputClass} placeholder="1~4인용" />
-              )} />
+              <Controller
+                control={control}
+                name="servings"
+                render={({ field }) => (
+                  <input {...field} className={inputClass} placeholder="1~4인용" />
+                )}
+              />
             </Field>
             <div className="mb-4 flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3">
               <p className="text-sm font-medium text-white">스위치/밸브 유무 (침출형)</p>
               <Controller
                 control={control}
                 name="hasValve"
-                render={({ field }) => (
-                  <Toggle value={field.value} onChange={field.onChange} />
-                )}
+                render={({ field }) => <Toggle value={field.value} onChange={field.onChange} />}
               />
             </div>
           </>
         )}
-
 
         <Field label="메모 (선택)">
           <Controller

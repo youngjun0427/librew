@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase/firestore";
 import { Controller, useForm } from "react-hook-form";
 import type { Bean } from "../types";
+import { UnitInput } from "./UnitInput";
 
 export type BeanFormValues = {
   name: string;
@@ -144,35 +145,35 @@ export function BeanForm({ defaultValues, onSubmit, onBack, title, submitLabel =
 
         <div className="flex gap-3">
           <div className="flex-1">
-            <Field label="구매 가격 (원)">
+            <Field label="구매 가격">
               <Controller
                 control={control}
                 name="price"
                 render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" placeholder="25000" />
+                  <UnitInput {...field} type="numeric" unit="원" placeholder="25000" />
                 )}
               />
             </Field>
           </div>
           <div className="flex-1">
-            <Field label="구매 용량 (g)">
+            <Field label="구매 용량">
               <Controller
                 control={control}
                 name="totalWeight"
                 render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" />
+                  <UnitInput {...field} type="numeric" unit="g" />
                 )}
               />
             </Field>
           </div>
         </div>
 
-        <Field label="잔여 용량 (g)">
+        <Field label="잔여 용량">
           <Controller
             control={control}
             name="remainingWeight"
             render={({ field }) => (
-              <input {...field} className={inputClass} inputMode="numeric" />
+              <UnitInput {...field} type="numeric" unit="g" />
             )}
           />
         </Field>

@@ -254,6 +254,16 @@ export default function BrewPrepPage() {
                       }}
                       placeholder="예: 18클릭, 3.5, 중간-굵게"
                     />
+                    {(selectedGrinder.specs.currentGrindSetting || selectedRecipe?.grindSettings?.[selectedGrinder.id]) && (
+                      <div className="mt-2 space-y-1 rounded-xl bg-zinc-800/60 px-3 py-2.5 text-xs text-zinc-400">
+                        {selectedGrinder.specs.currentGrindSetting && (
+                          <p>기준 분쇄도: <span className="text-zinc-200">{selectedGrinder.specs.currentGrindSetting}</span></p>
+                        )}
+                        {selectedRecipe?.grindSettings?.[selectedGrinder.id] && (
+                          <p>최근 분쇄도: <span className="text-zinc-200">{selectedRecipe.grindSettings[selectedGrinder.id]}</span></p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

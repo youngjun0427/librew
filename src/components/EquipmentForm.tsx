@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Toggle } from "./Toggle";
 import type { Equipment, EquipmentSpecs } from "../types";
 import { UnitInput } from "./UnitInput";
 import { BottomSheetSelect } from "./BottomSheetSelect";
+import { InfoBox } from "./InfoBox";
 
 export type EquipmentFormValues = {
   brand: string;
@@ -16,7 +16,6 @@ export type EquipmentFormValues = {
   servings: string;
   precision: string;
   hasTimer: boolean;
-  hasValve: boolean;
   notes: string;
 };
 
@@ -29,7 +28,6 @@ export function buildEquipmentSpecs(data: EquipmentFormValues): EquipmentSpecs {
     if (data.temperature) specs.temperature = Number(data.temperature);
   } else if (data.type === "dripper") {
     if (data.servings) specs.servings = data.servings;
-    if (data.hasValve !== undefined) specs.hasValve = data.hasValve;
   }
   return specs;
 }
@@ -115,7 +113,6 @@ export function EquipmentForm({
       servings: "",
       precision: "",
       hasTimer: false,
-      hasValve: false,
       notes: "",
       ...defaultValues,
     },
@@ -336,6 +333,9 @@ export function EquipmentForm({
 
         {type === "dripper" && (
           <>
+            <InfoBox>
+              스위치 여부는 레시피 설정 시 반영할 수 있어요.
+            </InfoBox>
             <Field label="사이즈 (선택)">
               <Controller
                 control={control}
@@ -356,14 +356,6 @@ export function EquipmentForm({
                 )}
               />
             </Field>
-            <div className="mb-4 flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3">
-              <p className="text-sm font-medium text-white">스위치/밸브 유무 (침출형)</p>
-              <Controller
-                control={control}
-                name="hasValve"
-                render={({ field }) => <Toggle value={field.value} onChange={field.onChange} />}
-              />
-            </div>
           </>
         )}
 

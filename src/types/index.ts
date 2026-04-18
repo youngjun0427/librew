@@ -20,7 +20,6 @@ export interface EquipmentSpecs {
   servings?: string;
   precision?: string;
   hasTimer?: boolean;
-  hasValve?: boolean;
 }
 
 export interface Recipe {

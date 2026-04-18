@@ -58,7 +58,7 @@ export default function App() {
     <HashRouter>
       <GlobalDataProvider>
         <Suspense fallback={<LoadingView />}>
-          <div className="pb-16">
+          <div className="pb-nav-safe">
             <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<AuthGuard><HomePage /></AuthGuard>} />

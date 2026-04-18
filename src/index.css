@@ -1,3 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── 모바일 앱 전역 최적화 ─────────────────────────────────────── */
+
+/* 탭 하이라이트 제거 (iOS/Android 터치 시 파란 사각형) */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 스크롤바 숨기기 */
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* 오버스크롤/바운스 방지 (iOS 과스크롤, Android 당겨서 새로고침) */
+html,
+body {
+  overscroll-behavior: none;
+}
+
+/* 버튼·링크 텍스트 선택 방지 (꾹 눌렀을 때 텍스트 셀렉션 방지) */
+button,
+a,
+[role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ─── Safe Area 유틸리티 ─────────────────────────────────────────── */
+@layer utilities {
+  /* BottomNav용: pb-6 + 홈 인디케이터 여백 */
+  .pb-safe-6 {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  /* App 콘텐츠 오프셋용 */
+  .pb-nav-safe {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+}

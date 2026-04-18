@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { useBrewLogs } from "../../hooks/useBrewLogs";
 import { useEquipment } from "../../hooks/useEquipment";
 import { useRecipes } from "../../hooks/useRecipes";
@@ -49,6 +51,7 @@ export default function RecipeDetailPage() {
   const { brewLogs } = useBrewLogs();
   const { equipment } = useEquipment();
   const recipe = recipes.find((r) => r.id === id);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   if (!recipe) {
     return (
@@ -60,7 +63,7 @@ export default function RecipeDetailPage() {
   }
 
   const handleDelete = async () => {
-    if (!window.confirm("이 레시피를 삭제할까요?")) return;
+    setShowDeleteDialog(false);
     await deleteRecipe(id!);
     navigate(-1);
   };
@@ -82,7 +85,7 @@ export default function RecipeDetailPage() {
         <button onClick={() => navigate(-1)} className="text-amber-400">← 뒤로</button>
         <div className="flex gap-4">
           <button onClick={() => navigate(`/recipe/edit/${id}`)} className="text-amber-400">수정</button>
-          <button onClick={handleDelete} className="text-red-400">삭제</button>
+          <button onClick={() => setShowDeleteDialog(true)} className="text-red-400">삭제</button>
         </div>
       </div>
 
@@ -159,6 +162,16 @@ export default function RecipeDetailPage() {
       >
         ⚡ 이 레시피로 브루잉 시작
       </button>
+
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="레시피를 삭제할까요?"
+        description="삭제하면 복구할 수 없어요"
+        confirmLabel="삭제"
+        variant="danger"
+        onConfirm={handleDelete}
+        onClose={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 }

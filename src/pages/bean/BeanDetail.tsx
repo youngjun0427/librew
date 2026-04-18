@@ -2,6 +2,7 @@ import type { Timestamp } from "firebase/firestore";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BeanForm, beanFormToData, type BeanFormValues } from "../../components/BeanForm";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { useBeans } from "../../hooks/useBeans";
 import { useBrewLogs } from "../../hooks/useBrewLogs";
 import { useRecipes } from "../../hooks/useRecipes";
@@ -27,6 +28,7 @@ export default function BeanDetailPage() {
   const { recipes } = useRecipes();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const bean = beans.find((b) => b.id === id);
 
   if (!bean) {
@@ -58,7 +60,7 @@ export default function BeanDetailPage() {
   }
 
   const handleDelete = async () => {
-    if (!window.confirm("이 원두를 삭제할까요?")) return;
+    setShowDeleteDialog(false);
     await deleteBean(id!);
     navigate(-1);
   };
@@ -74,7 +76,7 @@ export default function BeanDetailPage() {
         <button onClick={() => navigate(-1)} className="text-amber-400">← 뒤로</button>
         <div className="flex gap-4">
           <button onClick={() => setIsEditing(true)} className="text-amber-400">수정</button>
-          <button onClick={handleDelete} className="text-red-400">삭제</button>
+          <button onClick={() => setShowDeleteDialog(true)} className="text-red-400">삭제</button>
         </div>
       </div>
 
@@ -93,6 +95,16 @@ export default function BeanDetailPage() {
           <div className="h-2 rounded-full bg-amber-400" style={{ width: `${pct}%` }} />
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="원두를 삭제할까요?"
+        description="삭제하면 복구할 수 없어요"
+        confirmLabel="삭제"
+        variant="danger"
+        onConfirm={handleDelete}
+        onClose={() => setShowDeleteDialog(false)}
+      />
 
       <div className="mt-8 pb-10">
         <h2 className="mb-4 text-lg font-bold text-white">이 원두의 추출 기록</h2>

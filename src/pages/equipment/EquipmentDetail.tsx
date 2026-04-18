@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import {
   buildEquipmentSpecs,
   EquipmentForm,
@@ -11,6 +13,7 @@ export default function EquipmentDetailPage() {
   const navigate = useNavigate();
   const { equipment, updateEquipment, deleteEquipment } = useEquipment();
   const item = equipment.find((e) => e.id === id);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   if (!item) {
     return (
@@ -42,7 +45,7 @@ export default function EquipmentDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("이 장비를 삭제할까요?")) return;
+    setShowDeleteDialog(false);
     await deleteEquipment(id!);
     navigate(-1);
   };
@@ -65,13 +68,22 @@ export default function EquipmentDetailPage() {
               {isSubmitting ? "저장 중..." : "수정 완료"}
             </button>
             <button
-              onClick={handleDelete}
+              onClick={() => setShowDeleteDialog(true)}
               className="rounded-2xl bg-red-400/10 px-6 font-bold text-red-400 active:bg-red-400/20 transition-colors"
             >
               삭제
             </button>
           </div>
         )}
+      />
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="장비를 삭제할까요?"
+        description="삭제하면 복구할 수 없어요"
+        confirmLabel="삭제"
+        variant="danger"
+        onConfirm={handleDelete}
+        onClose={() => setShowDeleteDialog(false)}
       />
     </div>
   );

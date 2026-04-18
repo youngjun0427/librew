@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { useBrewLogs } from "../../hooks/useBrewLogs";
 import { useRecipes } from "../../hooks/useRecipes";
 import { useBrewSessionStore } from "../../store/useBrewSessionStore";
@@ -110,6 +111,7 @@ export default function BrewEvaluatePage() {
   const [updateTemp, setUpdateTemp] = useState(true);
   const [updateWater, setUpdateWater] = useState(true);
   const [updateGrind, setUpdateGrind] = useState(true);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
   const hasTips = Object.values(tips).some((v) => v && v.trim());
 
@@ -157,12 +159,7 @@ export default function BrewEvaluatePage() {
     }
   };
 
-  const handleHome = () => {
-    if (window.confirm("저장하지 않고 나가시겠어요?")) {
-      reset();
-      navigate("/", { replace: true });
-    }
-  };
+  const handleHome = () => setShowLeaveDialog(true);
 
   return (
     <div className="min-h-screen bg-zinc-900">
@@ -284,6 +281,16 @@ export default function BrewEvaluatePage() {
           {isSaving ? "저장 중..." : "저장하기"}
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={showLeaveDialog}
+        title="저장하지 않고 나갈까요?"
+        description="입력한 평가 내용이 사라져요"
+        confirmLabel="나가기"
+        variant="danger"
+        onConfirm={() => { reset(); navigate("/", { replace: true }); }}
+        onClose={() => setShowLeaveDialog(false)}
+      />
     </div>
   );
 }

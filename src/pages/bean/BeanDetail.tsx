@@ -103,7 +103,7 @@ export default function BeanDetailPage() {
             {beanLogs.map((log) => {
               const recipe = recipes.find(r => r.id === log.recipeId);
               const score = log.sensoryNote?.overall;
-              const hasOverrides = log.actualGrindSize != null || log.actualWaterTemp != null || log.actualFilterType != null;
+              const hasOverrides = log.actualGrindSetting != null || log.actualWaterTemp != null || log.actualFilterType != null;
               
               return (
                 <Link
@@ -134,7 +134,7 @@ export default function BeanDetailPage() {
                       <div className="mt-3 rounded-xl border border-zinc-700 bg-zinc-900/50 p-3">
                         <p className="mb-1.5 text-[10px] font-semibold tracking-wider text-amber-400/80">🔥 변경된 세팅 (Override)</p>
                         <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-zinc-400">
-                          {log.actualGrindSize != null && <li>분쇄도: <span className="text-zinc-200">{log.actualGrindSize}</span></li>}
+                          {log.actualGrindSetting != null && <li>분쇄도: <span className="text-zinc-200">{log.actualGrindSetting}</span></li>}
                           {log.actualWaterTemp != null && <li>온도: <span className="text-zinc-200">{log.actualWaterTemp}°C</span></li>}
                           {log.actualFilterType != null && <li>필터: <span className="text-zinc-200">{log.actualFilterType}</span></li>}
                         </ul>

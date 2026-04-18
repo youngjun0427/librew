@@ -10,7 +10,7 @@ function RecipeSelectCard({
 }: { recipe: Recipe; selected: boolean; onPress: () => void }) {
   const totalWater = recipe.steps.reduce((s, step) => s + step.waterAmount, 0);
   const totalTime = recipe.steps.reduce(
-    (s, step) => s + (step.duration ?? 0) + (step.waitTime ?? 0), 0
+    (s, step) => s + (step.duration ?? 0), 0
   );
   const timeStr = totalTime > 0 ? `${Math.floor(totalTime / 60)}m ${totalTime % 60}s` : null;
 
@@ -28,7 +28,7 @@ function RecipeSelectCard({
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <div className="rounded-lg bg-zinc-700 px-2 py-1">
-              <span className="text-xs text-zinc-300">▽ {recipe.grindSize} · {recipe.brewMethod}</span>
+              <span className="text-xs text-zinc-300">▽ {recipe.brewMethod}</span>
             </div>
             <div className="rounded-lg bg-zinc-700 px-2 py-1">
               <span className="text-xs text-zinc-300">◈ {recipe.waterTemp}°C</span>

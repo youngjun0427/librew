@@ -265,31 +265,34 @@ export function EquipmentForm({
             )}
           </>
         ) : (
-          /* 그라인더 외 or 편집 모드 */
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Field label="브랜드">
-                <Controller
-                  control={control}
-                  name="brand"
-                  render={({ field }) => (
-                    <input {...field} className={inputClass} placeholder="예: Comandante" />
-                  )}
-                />
-              </Field>
+          <>
+            {type === "dripper" && <InfoBox>스위치 여부는 레시피에서 적용할 수 있어요.</InfoBox>}
+            {/* 그라인더 외 or 편집 모드 */}
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <Field label="브랜드">
+                  <Controller
+                    control={control}
+                    name="brand"
+                    render={({ field }) => (
+                      <input {...field} className={inputClass} placeholder="예: Comandante" />
+                    )}
+                  />
+                </Field>
+              </div>
+              <div className="flex-1">
+                <Field label="모델명">
+                  <Controller
+                    control={control}
+                    name="model"
+                    render={({ field }) => (
+                      <input {...field} className={inputClass} placeholder="예: C40 MK4" />
+                    )}
+                  />
+                </Field>
+              </div>
             </div>
-            <div className="flex-1">
-              <Field label="모델명">
-                <Controller
-                  control={control}
-                  name="model"
-                  render={({ field }) => (
-                    <input {...field} className={inputClass} placeholder="예: C40 MK4" />
-                  )}
-                />
-              </Field>
-            </div>
-          </div>
+          </>
         )}
 
         {type === "grinder" && (
@@ -333,9 +336,6 @@ export function EquipmentForm({
 
         {type === "dripper" && (
           <>
-            <InfoBox>
-              스위치 여부는 레시피 설정 시 반영할 수 있어요.
-            </InfoBox>
             <Field label="사이즈 (선택)">
               <Controller
                 control={control}

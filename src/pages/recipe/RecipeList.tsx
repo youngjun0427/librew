@@ -6,16 +6,16 @@ import type { Recipe } from "../../types";
 
 function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () => void }) {
   const ratio =
-    recipe.coffeeWeight > 0
-      ? `1:${(recipe.waterWeight / recipe.coffeeWeight).toFixed(1)}`
-      : "-";
+    recipe.coffeeWeight > 0 ? `1:${(recipe.waterWeight / recipe.coffeeWeight).toFixed(1)}` : "-";
   return (
     <button className="mb-3 w-full rounded-2xl bg-zinc-800 p-4 text-left" onClick={onPress}>
       <p className="text-base font-semibold text-white">{recipe.title}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         <span className="text-sm text-zinc-400">{recipe.brewMethod}</span>
         <span className="text-sm text-zinc-600">·</span>
-        <span className="text-sm text-zinc-400">{recipe.coffeeWeight}g / {recipe.waterWeight}ml</span>
+        <span className="text-sm text-zinc-400">
+          {recipe.coffeeWeight}g / {recipe.waterWeight}ml
+        </span>
         <span className="text-sm text-zinc-600">·</span>
         <span className="text-sm text-zinc-400">{ratio}</span>
       </div>
@@ -35,9 +35,10 @@ export default function RecipeListPage() {
       <div className="flex items-center justify-between px-5 pb-2 pt-14">
         <div>
           <h1 className="text-lg font-bold text-white">레시피</h1>
-          <p className="text-xs text-zinc-500">My Library</p>
         </div>
-        <button onClick={() => navigate("/recipe/new")} className="text-amber-400">+ 추가</button>
+        <button onClick={() => navigate("/recipe/new")} className="text-amber-400">
+          + 추가
+        </button>
       </div>
 
       {recipes.length === 0 ? (
@@ -50,7 +51,11 @@ export default function RecipeListPage() {
       ) : (
         <div className="px-5 pb-8">
           {recipes.map((item) => (
-            <RecipeCard key={item.id} recipe={item} onPress={() => navigate(`/recipe/${item.id}`)} />
+            <RecipeCard
+              key={item.id}
+              recipe={item}
+              onPress={() => navigate(`/recipe/${item.id}`)}
+            />
           ))}
         </div>
       )}

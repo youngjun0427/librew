@@ -30,7 +30,7 @@ export default function ShareViewerPage() {
       title: `${r.title} (가져옴)`,
       brewMethod: r.brewMethod,
       filterType: r.filterType,
-      grindSize: r.grindSize,
+      grindSettings: r.grindSettings ?? {},
       waterTemp: r.waterTemp,
       coffeeWeight: r.coffeeWeight,
       waterWeight: r.waterWeight,
@@ -71,7 +71,6 @@ export default function ShareViewerPage() {
           [
             ["드리퍼", r.brewMethod],
             ["필터", r.filterType],
-            ["분쇄도", String(r.grindSize)],
             ["물 온도", `${r.waterTemp}°C`],
             ["원두", `${r.coffeeWeight}g`],
             ["물", `${r.waterWeight}ml`],

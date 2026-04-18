@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useBrewLogs } from "../../hooks/useBrewLogs";
+import { useEquipment } from "../../hooks/useEquipment";
 import { useRecipes } from "../../hooks/useRecipes";
-import { useBrewSessionStore } from "../../store/useBrewSessionStore";
 import type { BrewLog } from "../../types";
 
 function ParamRow({ label, value }: { label: string; value: string }) {
@@ -47,7 +47,7 @@ export default function RecipeDetailPage() {
   const navigate = useNavigate();
   const { recipes, deleteRecipe } = useRecipes();
   const { brewLogs } = useBrewLogs();
-  const { setSelectedRecipe } = useBrewSessionStore();
+  const { equipment } = useEquipment();
   const recipe = recipes.find((r) => r.id === id);
 
   if (!recipe) {
@@ -66,8 +66,7 @@ export default function RecipeDetailPage() {
   };
 
   const handleStartBrew = () => {
-    setSelectedRecipe(recipe);
-    navigate("/brew/prep");
+    navigate("/brew/prep", { state: { recipeId: recipe.id } });
   };
 
   const ratio =
@@ -93,12 +92,26 @@ export default function RecipeDetailPage() {
         <p className="mb-3 text-sm font-semibold text-zinc-300">파라미터</p>
         <ParamRow label="추출 방식" value={recipe.brewMethod} />
         <ParamRow label="필터 종류" value={recipe.filterType} />
-        <ParamRow label="분쇄도" value={String(recipe.grindSize)} />
         <ParamRow label="물 온도" value={`${recipe.waterTemp}°C`} />
         <ParamRow label="원두량" value={`${recipe.coffeeWeight}g`} />
         <ParamRow label="물량" value={`${recipe.waterWeight}ml`} />
         <ParamRow label="비율" value={`1:${ratio}`} />
       </div>
+
+      {recipe.grindSettings && Object.keys(recipe.grindSettings).length > 0 && (
+        <div className="mb-4 rounded-2xl bg-zinc-800 p-5">
+          <p className="mb-3 text-sm font-semibold text-zinc-300">그라인더별 분쇄도</p>
+          {Object.entries(recipe.grindSettings).map(([grinderId, setting]) => {
+            const grinder = equipment.find((e) => e.id === grinderId);
+            return (
+              <div key={grinderId} className="flex items-center justify-between py-2">
+                <span className="text-sm text-zinc-400">{grinder?.name ?? grinderId}</span>
+                <span className="text-sm font-medium text-white">{setting}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {recipe.steps.length > 0 && (
         <div className="mb-4 rounded-2xl bg-zinc-800 p-5">
@@ -113,12 +126,8 @@ export default function RecipeDetailPage() {
                 {step.pourMethod ? (
                   <p className="mt-0.5 text-xs text-zinc-400">{step.pourMethod}</p>
                 ) : null}
-                {(step.duration > 0 || step.waitTime > 0) && (
-                  <p className="mt-0.5 text-xs text-zinc-500">
-                    {step.duration > 0 ? `붓기 ${step.duration}초` : ""}
-                    {step.duration > 0 && step.waitTime > 0 ? " · " : ""}
-                    {step.waitTime > 0 ? `대기 ${step.waitTime}초` : ""}
-                  </p>
+                {step.duration > 0 && (
+                  <p className="mt-0.5 text-xs text-zinc-500">{step.duration}초</p>
                 )}
                 {step.tip ? <p className="mt-0.5 text-xs text-zinc-500">{step.tip}</p> : null}
               </div>

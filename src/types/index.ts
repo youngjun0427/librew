@@ -26,13 +26,13 @@ export interface EquipmentSpecs {
 export interface Recipe {
   id: string;
   title: string;
-  grindSize: number;
   waterTemp: number;
   coffeeWeight: number;
   waterWeight: number;
   filterType: string;
   brewMethod: string;
   grinderName: string | null;
+  grindSettings?: Record<string, string>; // grinderId → setting (e.g. "18클릭")
   steps: RecipeStep[];
   isPublic: boolean;
   shareId: string | null;
@@ -43,7 +43,6 @@ export interface RecipeStep {
   order: number;
   waterAmount: number;
   duration: number;
-  waitTime: number;
   pourMethod: string;
   tip: string | null;
 }
@@ -75,7 +74,8 @@ export interface BrewLog {
   beanId: string | null;
   usedCoffeeWeight: number;
   actualWaterWeight: number;
-  actualGrindSize?: number;
+  grinderId?: string;
+  actualGrindSetting?: string;
   actualWaterTemp?: number;
   actualFilterType?: string;
   totalBrewTime: number;

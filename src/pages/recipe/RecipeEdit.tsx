@@ -19,16 +19,14 @@ export default function RecipeEditPage() {
     brewMethod: recipe.brewMethod,
     filterType: recipe.filterType,
     grinderName: recipe.grinderName ?? "",
-    grindSize: String(recipe.grindSize),
     waterTemp: String(recipe.waterTemp),
     coffeeWeight: String(recipe.coffeeWeight),
     waterWeight: String(recipe.waterWeight),
-    steps: recipe.steps.map((s) => ({
-      waterAmount: String(s.waterAmount),
-      duration: String(s.duration ?? 0),
-      waitTime: String(s.waitTime ?? 0),
-      pourMethod: s.pourMethod ?? "",
-      tip: s.tip ?? "",
+    steps: recipe.steps.map((_, i) => ({
+      waterAmount: String(recipe.steps.slice(0, i + 1).reduce((sum, st) => sum + st.waterAmount, 0)),
+      duration: String(recipe.steps.slice(0, i + 1).reduce((sum, st) => sum + st.duration, 0)),
+      pourMethod: recipe.steps[i].pourMethod ?? "",
+      tip: recipe.steps[i].tip ?? "",
     })),
   };
 
@@ -38,7 +36,6 @@ export default function RecipeEditPage() {
       brewMethod: data.brewMethod,
       filterType: data.filterType,
       grinderName: data.grinderName || null,
-      grindSize: Number(data.grindSize),
       waterTemp: Number(data.waterTemp),
       coffeeWeight: Number(data.coffeeWeight),
       waterWeight: Number(data.waterWeight),
@@ -46,7 +43,6 @@ export default function RecipeEditPage() {
         order: i + 1,
         waterAmount: Number(s.waterAmount),
         duration: Number(s.duration) || 0,
-        waitTime: Number(s.waitTime) || 0,
         pourMethod: s.pourMethod,
         tip: s.tip || null,
       })),

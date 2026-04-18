@@ -2,27 +2,24 @@ import { useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { BottomSheet } from "./BottomSheet";
+import { UnitInput } from "./UnitInput";
 
 export type RecipeFormValues = {
   title: string;
   brewMethod: string;
   filterType: string;
   grinderName: string;
-  grindSize: string;
   waterTemp: string;
   coffeeWeight: string;
   waterWeight: string;
   steps: {
     waterAmount: string;
     duration: string;
-    waitTime: string;
     pourMethod: string;
     tip: string;
   }[];
 };
 
-const inputClass =
-  "w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white placeholder-zinc-500 outline-none focus:border-amber-400";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -64,25 +61,17 @@ export function RecipeForm({
       brewMethod: "",
       filterType: "종이",
       grinderName: "",
-      grindSize: "5",
       waterTemp: "93",
       coffeeWeight: "15",
       waterWeight: "225",
-      steps: [
-        {
-          waterAmount: "50",
-          duration: "10",
-          waitTime: "30",
-          pourMethod: "원을 그리며",
-          tip: "뜸들이기",
-        },
-      ],
+      steps: [{ waterAmount: "50", duration: "0", pourMethod: "원을 그리며", tip: "뜸들이기" }],
       ...defaultValues,
     },
   });
   const { fields, append, remove } = useFieldArray({ control, name: "steps" });
   const brewMethodValue = useWatch({ control, name: "brewMethod" });
   const grinderNameValue = useWatch({ control, name: "grinderName" });
+  const stepsWatch = useWatch({ control, name: "steps" });
 
   const [sheet, setSheet] = useState<"dripper" | "grinder" | null>(null);
 
@@ -101,7 +90,7 @@ export function RecipeForm({
             control={control}
             name="title"
             render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="미입력 시 드리퍼, 원두량으로 자동 생성" />
+              <UnitInput {...field} type="text" placeholder="미입력 시 드리퍼, 원두량으로 자동 생성" />
             )}
           />
         </Field>
@@ -109,20 +98,13 @@ export function RecipeForm({
         <Field label="추출 도구 (드리퍼)">
           <div 
             onClick={() => setSheet("dripper")}
-            className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
+            className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
           >
             <span className={brewMethodValue ? "text-white" : "text-zinc-500"}>
               {brewMethodValue || "내 장비에서 선택"}
             </span>
             <span className="text-amber-400 text-sm">선택</span>
           </div>
-          <Controller
-            control={control}
-            name="brewMethod"
-            render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="직접 입력 (에어로프레스 등)" />
-            )}
-          />
         </Field>
 
         <Field label="필터">
@@ -130,7 +112,7 @@ export function RecipeForm({
             control={control}
             name="filterType"
             render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="예: 종이, 금속" />
+              <UnitInput {...field} type="text" placeholder="예: 종이, 금속" />
             )}
           />
         </Field>
@@ -138,66 +120,44 @@ export function RecipeForm({
         <Field label="그라인더">
           <div 
             onClick={() => setSheet("grinder")}
-            className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
+            className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
           >
             <span className={grinderNameValue ? "text-white" : "text-zinc-500"}>
               {grinderNameValue || "내 장비에서 선택"}
             </span>
             <span className="text-amber-400 text-sm">선택</span>
           </div>
+        </Field>
+
+        <Field label="물 온도">
           <Controller
             control={control}
-            name="grinderName"
+            name="waterTemp"
             render={({ field }) => (
-              <input {...field} className={inputClass} placeholder="직접 입력 (선택)" />
+              <UnitInput {...field} type="numeric" unit="°C" />
             )}
           />
         </Field>
 
         <div className="flex gap-3">
           <div className="flex-1">
-            <Field label="분쇄도">
-              <Controller
-                control={control}
-                name="grindSize"
-                render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" />
-                )}
-              />
-            </Field>
-          </div>
-          <div className="flex-1">
-            <Field label="물 온도 (°C)">
-              <Controller
-                control={control}
-                name="waterTemp"
-                render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" />
-                )}
-              />
-            </Field>
-          </div>
-        </div>
-
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <Field label="원두 (g)">
+            <Field label="원두">
               <Controller
                 control={control}
                 name="coffeeWeight"
                 render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" />
+                  <UnitInput {...field} type="numeric" unit="g" />
                 )}
               />
             </Field>
           </div>
           <div className="flex-1">
-            <Field label="물 (ml)">
+            <Field label="물">
               <Controller
                 control={control}
                 name="waterWeight"
                 render={({ field }) => (
-                  <input {...field} className={inputClass} inputMode="numeric" />
+                  <UnitInput {...field} type="numeric" unit="ml" />
                 )}
               />
             </Field>
@@ -205,78 +165,88 @@ export function RecipeForm({
         </div>
 
         <p className="mb-3 mt-2 text-base font-semibold text-white">추출 단계</p>
-        {fields.map((field, index) => (
-          <div key={field.id} className="mb-3 rounded-2xl bg-zinc-800 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm font-medium text-zinc-300">Step {index + 1}</span>
-              {fields.length > 1 && (
-                <button onClick={() => remove(index)} className="text-sm text-red-400">
-                  삭제
-                </button>
-              )}
-            </div>
-
-            <div className="mb-2 flex gap-2">
-              <div className="flex-1">
-                <p className="mb-1 text-xs text-zinc-500">물량 (ml)</p>
-                <Controller
-                  control={control}
-                  name={`steps.${index}.waterAmount`}
-                  render={({ field: f }) => (
-                    <input {...f} className={inputClass} inputMode="numeric" />
-                  )}
-                />
-              </div>
-              <div className="flex-1">
-                <p className="mb-1 text-xs text-zinc-500">붓는 시간 (초)</p>
-                <Controller
-                  control={control}
-                  name={`steps.${index}.duration`}
-                  render={({ field: f }) => (
-                    <input {...f} className={inputClass} inputMode="numeric" />
-                  )}
-                />
-              </div>
-              <div className="flex-1">
-                <p className="mb-1 text-xs text-zinc-500">대기 (초)</p>
-                <Controller
-                  control={control}
-                  name={`steps.${index}.waitTime`}
-                  render={({ field: f }) => (
-                    <input {...f} className={inputClass} inputMode="numeric" />
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="mb-2">
-              <p className="mb-1 text-xs text-zinc-500">푸어링 방식</p>
-              <Controller
-                control={control}
-                name={`steps.${index}.pourMethod`}
-                render={({ field: f }) => (
-                  <input {...f} className={inputClass} placeholder="예: 원을 그리며 중앙부터" />
+        {fields.map((field, index) => {
+          const isBloom = index === 0;
+          const prevWater = index > 0 ? Number(stepsWatch[index - 1]?.waterAmount) || 0 : 0;
+          const prevDur = index > 0 ? Number(stepsWatch[index - 1]?.duration) || 0 : 0;
+          const curWater = Number(stepsWatch[index]?.waterAmount) || 0;
+          const addWaterHint = curWater > prevWater ? `+${curWater - prevWater}ml 추가` : null;
+          return (
+            <div key={field.id} className="mb-3 rounded-2xl bg-zinc-800 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-sm font-medium text-zinc-300">
+                  {isBloom ? "Step 1 · 뜸들이기" : `Step ${index + 1}`}
+                </span>
+                {fields.length > 1 && (
+                  <button onClick={() => remove(index)} className="text-sm text-red-400">
+                    삭제
+                  </button>
                 )}
-              />
-            </div>
+              </div>
 
-            <div>
-              <p className="mb-1 text-xs text-zinc-500">팁 (선택)</p>
-              <Controller
-                control={control}
-                name={`steps.${index}.tip`}
-                render={({ field: f }) => (
-                  <input {...f} className={inputClass} placeholder="예: 드리퍼가 충분히 젖도록" />
+              <div className={`mb-3 ${isBloom ? "" : "flex gap-2"}`}>
+                <div className={isBloom ? "mb-3" : "flex-1"}>
+                  <p className="mb-1 text-xs text-zinc-500">
+                    {isBloom ? "물양" : "누적 물양"}
+                    {!isBloom && addWaterHint && (
+                      <span className="ml-1.5 text-amber-400/70">{addWaterHint}</span>
+                    )}
+                  </p>
+                  <Controller
+                    control={control}
+                    name={`steps.${index}.waterAmount`}
+                    render={({ field: f }) => (
+                      <UnitInput {...f} type="numeric" unit="ml" />
+                    )}
+                  />
+                </div>
+                {!isBloom && (
+                  <div className="flex-1">
+                    <p className="mb-1 text-xs text-zinc-500">
+                      누적 시간
+                      {prevDur > 0 && (
+                        <span className="ml-1.5 text-zinc-600">이전 {prevDur}초</span>
+                      )}
+                    </p>
+                    <Controller
+                      control={control}
+                      name={`steps.${index}.duration`}
+                      render={({ field: f }) => (
+                        <UnitInput {...f} type="numeric" unit="초" placeholder={String(prevDur + 1)} />
+                      )}
+                    />
+                  </div>
                 )}
-              />
-            </div>
-          </div>
-        ))}
+              </div>
 
+              <div className="mb-3">
+                <p className="mb-1 text-xs text-zinc-500">푸어링 방식</p>
+                <Controller
+                  control={control}
+                  name={`steps.${index}.pourMethod`}
+                  render={({ field: f }) => (
+                    <UnitInput {...f} type="text" placeholder="예: 원을 그리며 중앙부터" />
+                  )}
+                />
+              </div>
+
+              <div>
+                <p className="mb-1 text-xs text-zinc-500">팁 (선택)</p>
+                <Controller
+                  control={control}
+                  name={`steps.${index}.tip`}
+                  render={({ field: f }) => (
+                    <UnitInput {...f} type="text" placeholder="예: 드리퍼가 충분히 젖도록" />
+                  )}
+                />
+              </div>
+            </div>
+          );
+        })}
         <button
           className="mb-6 w-full rounded-2xl border border-dashed border-amber-400/40 py-3 text-amber-400"
           onClick={() =>
-            append({ waterAmount: "", duration: "", waitTime: "", pourMethod: "", tip: "" })
+            append({ waterAmount: "", duration: "", pourMethod: "", tip: "" })
           }
           type="button"
         >
@@ -285,7 +255,17 @@ export function RecipeForm({
 
         <button
           className={`w-full rounded-2xl py-4 font-bold text-zinc-900 ${isSubmitting ? "bg-amber-300" : "bg-amber-400"}`}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSubmit(async (data) => {
+            const normalized = {
+              ...data,
+              steps: data.steps.map((s, i) => ({
+                ...s,
+                waterAmount: String(Math.max(0, Number(s.waterAmount) - (i > 0 ? Number(data.steps[i - 1].waterAmount) : 0))),
+                duration: i === 0 ? "0" : String(Math.max(0, Number(s.duration) - Number(data.steps[i - 1].duration))),
+              })),
+            };
+            await onSubmit(normalized);
+          })}
           disabled={isSubmitting}
         >
           {isSubmitting ? "저장 중..." : submitLabel}

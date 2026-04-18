@@ -7,6 +7,7 @@ import { useBeanStore } from "../store/useBeanStore";
 import { useBrewLogStore } from "../store/useBrewLogStore";
 import { useEquipmentStore } from "../store/useEquipmentStore";
 import { useRecipeStore } from "../store/useRecipeStore";
+import type { Bean, BrewLog, Equipment, Recipe } from "../types";
 
 export function GlobalDataProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuthStore();
@@ -51,8 +52,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubBeans = onSnapshot(
       query(collection(db, "users", user.uid, "beans")),
       (snap) => {
-        const items = snap.docs.map((d) => parseBean(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseBean>[];
-        setBeans(items.sort((a, b) => (b?.purchasedAt?.seconds ?? 0) - (a?.purchasedAt?.seconds ?? 0)) as ReturnType<typeof parseBean>[]);
+        const items = snap.docs.map((d) => parseBean(d.id, d.data())).filter(Boolean) as Bean[];
+        setBeans(items.sort((a, b) => (b?.purchasedAt?.seconds ?? 0) - (a?.purchasedAt?.seconds ?? 0)));
         setBeansLoading(false);
         setBeansInitialized(true);
       },
@@ -62,8 +63,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubRecipes = onSnapshot(
       query(collection(db, "users", user.uid, "recipes")),
       (snap) => {
-        const items = snap.docs.map((d) => parseRecipe(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseRecipe>[];
-        setRecipes(items.sort((a, b) => (b?.createdAt?.seconds ?? 0) - (a?.createdAt?.seconds ?? 0)) as ReturnType<typeof parseRecipe>[]);
+        const items = snap.docs.map((d) => parseRecipe(d.id, d.data())).filter(Boolean) as Recipe[];
+        setRecipes(items.sort((a, b) => (b?.createdAt?.seconds ?? 0) - (a?.createdAt?.seconds ?? 0)));
         setRecipesLoading(false);
         setRecipesInitialized(true);
       },
@@ -73,8 +74,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubEquipment = onSnapshot(
       query(collection(db, "users", user.uid, "equipment")),
       (snap) => {
-        const items = snap.docs.map((d) => parseEquipment(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseEquipment>[];
-        setEquipment(items.sort((a, b) => (b?.createdAt?.seconds ?? 0) - (a?.createdAt?.seconds ?? 0)) as ReturnType<typeof parseEquipment>[]);
+        const items = snap.docs.map((d) => parseEquipment(d.id, d.data())).filter(Boolean) as Equipment[];
+        setEquipment(items.sort((a, b) => (b?.createdAt?.seconds ?? 0) - (a?.createdAt?.seconds ?? 0)));
         setEquipmentLoading(false);
         setEquipmentInitialized(true);
       },
@@ -84,8 +85,8 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const unsubBrewLogs = onSnapshot(
       query(collection(db, "users", user.uid, "brewLogs")),
       (snap) => {
-        const items = snap.docs.map((d) => parseBrewLog(d.id, d.data())).filter(Boolean) as ReturnType<typeof parseBrewLog>[];
-        setBrewLogs(items.sort((a, b) => (b?.brewedAt?.seconds ?? 0) - (a?.brewedAt?.seconds ?? 0)) as ReturnType<typeof parseBrewLog>[]);
+        const items = snap.docs.map((d) => parseBrewLog(d.id, d.data())).filter(Boolean) as BrewLog[];
+        setBrewLogs(items.sort((a, b) => (b?.brewedAt?.seconds ?? 0) - (a?.brewedAt?.seconds ?? 0)));
         setBrewLogsLoading(false);
         setBrewLogsInitialized(true);
       },

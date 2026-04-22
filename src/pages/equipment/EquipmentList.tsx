@@ -1,41 +1,26 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ErrorView } from "../../components/ErrorView";
-import { InputDialog } from "../../components/InputDialog";
 import { LoadingView } from "../../components/LoadingView";
 import { useEquipment } from "../../hooks/useEquipment";
 import type { Equipment } from "../../types";
 
-const TYPE_ICONS: Record<Equipment["type"], string> = {
-  grinder: "⚙️",
-  dripper: "☕",
-  scale: "⚖️",
-  other: "🔧",
-};
-
-type Tab = "grinder" | "dripper" | "other";
+type Tab = "grinder" | "dripper" | "filter" | "other";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "grinder", label: "그라인더" },
   { key: "dripper", label: "드리퍼" },
+  { key: "filter", label: "필터" },
   { key: "other", label: "기타장비" },
 ];
 
 function filterByTab(equipment: Equipment[], tab: Tab): Equipment[] {
   if (tab === "grinder") return equipment.filter((e) => e.type === "grinder");
   if (tab === "dripper") return equipment.filter((e) => e.type === "dripper");
-  return equipment.filter((e) => e.type !== "grinder" && e.type !== "dripper");
+  if (tab === "filter") return equipment.filter((e) => e.type === "filter");
+  return equipment.filter((e) => e.type !== "grinder" && e.type !== "dripper" && e.type !== "filter");
 }
 
-function EquipmentCard({
-  item,
-  onPress,
-  onUpdateGrindSetting,
-}: {
-  item: Equipment;
-  onPress: () => void;
-  onUpdateGrindSetting: (id: string, currentVal: string) => void;
-}) {
+function EquipmentListItem({ item, onPress }: { item: Equipment; onPress: () => void }) {
   // 브랜드명을 제거한 순수 모델명 추출 (브랜드명이 이름 앞에 포함된 경우 대비)
   const displayName =
     item.brand && item.name.startsWith(item.brand)
@@ -44,59 +29,56 @@ function EquipmentCard({
 
   return (
     <div
-      className="flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-800 p-4 active:bg-zinc-700/50 cursor-pointer h-full"
       onClick={onPress}
+      className="flex items-center justify-between py-3.5 border-b border-zinc-800/80 active:bg-zinc-800 transition-colors cursor-pointer px-4"
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-700">
-          <span className="text-xl">{TYPE_ICONS[item.type]}</span>
-        </div>
+      <div className="flex items-center gap-2 min-w-0">
+        {item.brand && (
+          <span className="text-sm font-medium text-zinc-500 shrink-0">{item.brand}</span>
+        )}
+        <span className="text-base font-semibold text-zinc-100 truncate">{displayName}</span>
+      </div>
 
+      <div className="flex items-center gap-3 shrink-0 ml-2">
         {item.type === "grinder" && item.specs.currentGrindSetting && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdateGrindSetting(item.id, item.specs.currentGrindSetting || "");
-            }}
-            className="rounded-lg bg-zinc-900/50 px-3 py-1.5 text-right transition-colors active:bg-zinc-700"
-          >
+          <div className="flex items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-1.5">
+            <span className="text-xs font-medium text-zinc-400">분쇄도</span>
             <span className="text-sm font-bold text-amber-400">
               {item.specs.currentGrindSetting}
             </span>
-          </button>
+          </div>
         )}
-      </div>
-
-      <div>
-        {item.brand ? (
-          <p className="text-xs font-medium text-zinc-400 mb-0.5">{item.brand}</p>
-        ) : null}
-        <p className="text-base font-bold text-white leading-tight">{displayName}</p>
+        {item.type === "filter" && (
+          <div className="flex items-center gap-2">
+            {item.specs.filterSize && (
+              <span className="rounded-lg bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300">
+                {item.specs.filterSize}
+              </span>
+            )}
+            {item.specs.remainingAmount && (
+              <div className="flex items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-1.5">
+                <span className="text-xs font-medium text-zinc-400">잔여량</span>
+                <span className="text-sm font-bold text-emerald-400">
+                  {item.specs.remainingAmount}장
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+        <span className="text-zinc-600">›</span>
       </div>
     </div>
   );
 }
 
 export default function EquipmentListPage() {
-  const { equipment, isLoading, error, updateEquipment } = useEquipment();
+  const { equipment, isLoading, error } = useEquipment();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>("grinder");
-  const [grindDialog, setGrindDialog] = useState<{ id: string; value: string } | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = (searchParams.get("tab") as Tab) || "grinder";
 
-  const handleUpdateGrindSetting = (id: string, currentVal: string) => {
-    setGrindDialog({ id, value: currentVal });
-  };
-
-  const handleGrindConfirm = async (newVal: string) => {
-    if (!grindDialog) return;
-    const { id } = grindDialog;
-    setGrindDialog(null);
-    const equip = equipment.find((e) => e.id === id);
-    if (equip) {
-      await updateEquipment(id, {
-        specs: { ...equip.specs, currentGrindSetting: newVal.trim() || undefined },
-      });
-    }
+  const setTab = (newTab: Tab) => {
+    setSearchParams({ tab: newTab }, { replace: true });
   };
 
   if (isLoading) return <LoadingView />;
@@ -131,7 +113,7 @@ export default function EquipmentListPage() {
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-8">
+      <div className="flex-1 overflow-y-auto px-1 pt-3 pb-8">
         {items.length === 0 ? (
           <div className="flex flex-col items-center py-20">
             <p className="text-zinc-400">
@@ -139,28 +121,17 @@ export default function EquipmentListPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col">
             {items.map((item) => (
-              <EquipmentCard
+              <EquipmentListItem
                 key={item.id}
                 item={item}
                 onPress={() => navigate(`/equipment/${item.id}`)}
-                onUpdateGrindSetting={handleUpdateGrindSetting}
               />
             ))}
           </div>
         )}
       </div>
-
-      <InputDialog
-        isOpen={grindDialog !== null}
-        title="기준 분쇄도"
-        description="빈 칸으로 확인하면 삭제돼요"
-        defaultValue={grindDialog?.value ?? ""}
-        placeholder="예: 18클릭, 2.5"
-        onConfirm={handleGrindConfirm}
-        onClose={() => setGrindDialog(null)}
-      />
     </div>
   );
 }

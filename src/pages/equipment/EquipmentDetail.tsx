@@ -32,6 +32,8 @@ export default function EquipmentDetailPage() {
     filterType: item.specs.filterType ?? "", servings: item.specs.servings ?? "",
     precision: item.specs.precision ?? "", hasTimer: item.specs.hasTimer ?? false,
     hasValve: item.specs.hasValve ?? false,
+    remainingAmount: item.specs.remainingAmount ?? "",
+    filterSize: item.specs.filterSize ?? "",
   };
 
   const handleSubmit = async (data: EquipmentFormValues) => {

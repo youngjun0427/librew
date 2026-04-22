@@ -5,7 +5,7 @@ export interface Equipment {
   name: string;
   brand: string;
   model: string;
-  type: "grinder" | "dripper" | "scale" | "other";
+  type: "grinder" | "dripper" | "filter" | "other";
   specs: EquipmentSpecs;
   notes: string | null;
   createdAt: Timestamp;
@@ -15,9 +15,11 @@ export interface EquipmentSpecs {
   clickUnit?: string;
   currentGrindSetting?: string;
   filterType?: string;
+  filterSize?: string;
   servings?: string;
   precision?: string;
   hasTimer?: boolean;
+  remainingAmount?: string;
 }
 
 export interface Recipe {

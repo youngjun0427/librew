@@ -20,7 +20,6 @@ export type RecipeFormValues = {
   }[];
 };
 
-
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mb-4">
@@ -59,7 +58,7 @@ export function RecipeForm({
     defaultValues: {
       title: "",
       brewMethod: "",
-      filterType: "종이",
+      filterType: "",
       grinderName: "",
       waterTemp: "93",
       coffeeWeight: "15",
@@ -90,13 +89,17 @@ export function RecipeForm({
             control={control}
             name="title"
             render={({ field }) => (
-              <UnitInput {...field} type="text" placeholder="미입력 시 드리퍼, 원두량으로 자동 생성" />
+              <UnitInput
+                {...field}
+                type="text"
+                placeholder="미입력 시 드리퍼, 원두량으로 자동 생성"
+              />
             )}
           />
         </Field>
 
         <Field label="추출 도구 (드리퍼)">
-          <div 
+          <div
             onClick={() => setSheet("dripper")}
             className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
           >
@@ -112,13 +115,13 @@ export function RecipeForm({
             control={control}
             name="filterType"
             render={({ field }) => (
-              <UnitInput {...field} type="text" placeholder="예: 종이, 금속" />
+              <UnitInput {...field} type="text" placeholder="하리오 기본 필터, th3, 시바리스트 등" />
             )}
           />
         </Field>
 
         <Field label="그라인더">
-          <div 
+          <div
             onClick={() => setSheet("grinder")}
             className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white transition-colors active:bg-zinc-700"
           >
@@ -133,9 +136,7 @@ export function RecipeForm({
           <Controller
             control={control}
             name="waterTemp"
-            render={({ field }) => (
-              <UnitInput {...field} type="numeric" unit="°C" />
-            )}
+            render={({ field }) => <UnitInput {...field} type="numeric" unit="°C" />}
           />
         </Field>
 
@@ -145,9 +146,7 @@ export function RecipeForm({
               <Controller
                 control={control}
                 name="coffeeWeight"
-                render={({ field }) => (
-                  <UnitInput {...field} type="numeric" unit="g" />
-                )}
+                render={({ field }) => <UnitInput {...field} type="numeric" unit="g" />}
               />
             </Field>
           </div>
@@ -156,9 +155,7 @@ export function RecipeForm({
               <Controller
                 control={control}
                 name="waterWeight"
-                render={({ field }) => (
-                  <UnitInput {...field} type="numeric" unit="ml" />
-                )}
+                render={({ field }) => <UnitInput {...field} type="numeric" unit="ml" />}
               />
             </Field>
           </div>
@@ -195,9 +192,7 @@ export function RecipeForm({
                   <Controller
                     control={control}
                     name={`steps.${index}.waterAmount`}
-                    render={({ field: f }) => (
-                      <UnitInput {...f} type="numeric" unit="ml" />
-                    )}
+                    render={({ field: f }) => <UnitInput {...f} type="numeric" unit="ml" />}
                   />
                 </div>
                 {!isBloom && (
@@ -212,7 +207,12 @@ export function RecipeForm({
                       control={control}
                       name={`steps.${index}.duration`}
                       render={({ field: f }) => (
-                        <UnitInput {...f} type="numeric" unit="초" placeholder={String(prevDur + 1)} />
+                        <UnitInput
+                          {...f}
+                          type="numeric"
+                          unit="초"
+                          placeholder={String(prevDur + 1)}
+                        />
                       )}
                     />
                   </div>
@@ -245,9 +245,7 @@ export function RecipeForm({
         })}
         <button
           className="mb-6 w-full rounded-2xl border border-dashed border-amber-400/40 py-3 text-amber-400"
-          onClick={() =>
-            append({ waterAmount: "", duration: "", pourMethod: "", tip: "" })
-          }
+          onClick={() => append({ waterAmount: "", duration: "", pourMethod: "", tip: "" })}
           type="button"
         >
           + 단계 추가
@@ -260,8 +258,16 @@ export function RecipeForm({
               ...data,
               steps: data.steps.map((s, i) => ({
                 ...s,
-                waterAmount: String(Math.max(0, Number(s.waterAmount) - (i > 0 ? Number(data.steps[i - 1].waterAmount) : 0))),
-                duration: i === 0 ? "0" : String(Math.max(0, Number(s.duration) - Number(data.steps[i - 1].duration))),
+                waterAmount: String(
+                  Math.max(
+                    0,
+                    Number(s.waterAmount) - (i > 0 ? Number(data.steps[i - 1].waterAmount) : 0)
+                  )
+                ),
+                duration:
+                  i === 0
+                    ? "0"
+                    : String(Math.max(0, Number(s.duration) - Number(data.steps[i - 1].duration))),
               })),
             };
             await onSubmit(normalized);
@@ -272,15 +278,19 @@ export function RecipeForm({
         </button>
       </div>
 
-      <BottomSheet isOpen={sheet === "dripper"} onClose={() => setSheet(null)} title="추출 도구 선택">
+      <BottomSheet
+        isOpen={sheet === "dripper"}
+        onClose={() => setSheet(null)}
+        title="추출 도구 선택"
+      >
         <div className="mb-4 flex justify-between items-center px-1">
           <p className="text-sm text-zinc-400">내 장비에서 선택</p>
-          <button onClick={() => navigate("/equipment/new")} className="text-sm text-amber-400">+ 추가하기</button>
+          <button onClick={() => navigate("/equipment/new")} className="text-sm text-amber-400">
+            + 추가하기
+          </button>
         </div>
         {dripperOptions.length === 0 ? (
-          <div className="py-8 text-center text-zinc-500">
-            등록된 드리퍼가 없습니다
-          </div>
+          <div className="py-8 text-center text-zinc-500">등록된 드리퍼가 없습니다</div>
         ) : (
           <div className="flex flex-col gap-2">
             {dripperOptions.map((d) => (
@@ -292,7 +302,9 @@ export function RecipeForm({
                   setSheet(null);
                 }}
                 className={`w-full rounded-xl p-4 text-left font-medium transition-colors ${
-                  brewMethodValue === d ? "bg-amber-400/10 text-amber-400 ring-1 ring-amber-400" : "bg-zinc-800 text-white active:bg-zinc-700"
+                  brewMethodValue === d
+                    ? "bg-amber-400/10 text-amber-400 ring-1 ring-amber-400"
+                    : "bg-zinc-800 text-white active:bg-zinc-700"
                 }`}
               >
                 {d}
@@ -302,23 +314,30 @@ export function RecipeForm({
         )}
       </BottomSheet>
 
-      <BottomSheet isOpen={sheet === "grinder"} onClose={() => setSheet(null)} title="그라인더 선택">
+      <BottomSheet
+        isOpen={sheet === "grinder"}
+        onClose={() => setSheet(null)}
+        title="그라인더 선택"
+      >
         <div className="mb-4 flex justify-between items-center px-1">
           <p className="text-sm text-zinc-400">내 장비에서 선택</p>
-          <button onClick={() => navigate("/equipment/new")} className="text-sm text-amber-400">+ 추가하기</button>
+          <button onClick={() => navigate("/equipment/new")} className="text-sm text-amber-400">
+            + 추가하기
+          </button>
         </div>
         <button
           className="mb-2 flex w-full items-center py-3 text-zinc-400 active:bg-zinc-800"
-          onClick={() => { setValue("grinderName", ""); setSheet(null); }}
+          onClick={() => {
+            setValue("grinderName", "");
+            setSheet(null);
+          }}
         >
           <span className="flex-1 text-left text-sm px-1">선택 안 함</span>
           {!grinderNameValue && <span className="text-amber-400 text-sm">✓</span>}
         </button>
         <div className="mb-4 h-px bg-zinc-800" />
         {grinderOptions.length === 0 ? (
-          <div className="py-8 text-center text-zinc-500">
-            등록된 그라인더가 없습니다
-          </div>
+          <div className="py-8 text-center text-zinc-500">등록된 그라인더가 없습니다</div>
         ) : (
           <div className="flex flex-col gap-2">
             {grinderOptions.map((g) => (
@@ -330,7 +349,9 @@ export function RecipeForm({
                   setSheet(null);
                 }}
                 className={`w-full rounded-xl p-4 text-left font-medium transition-colors ${
-                  grinderNameValue === g ? "bg-amber-400/10 text-amber-400 ring-1 ring-amber-400" : "bg-zinc-800 text-white active:bg-zinc-700"
+                  grinderNameValue === g
+                    ? "bg-amber-400/10 text-amber-400 ring-1 ring-amber-400"
+                    : "bg-zinc-800 text-white active:bg-zinc-700"
                 }`}
               >
                 {g}

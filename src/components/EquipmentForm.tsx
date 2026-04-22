@@ -11,9 +11,11 @@ export type EquipmentFormValues = {
   type: Equipment["type"];
   currentGrindSetting: string;
   filterType: string;
+  filterSize: string;
   servings: string;
   precision: string;
   hasTimer: boolean;
+  remainingAmount: string;
   notes: string;
 };
 
@@ -23,6 +25,9 @@ export function buildEquipmentSpecs(data: EquipmentFormValues): EquipmentSpecs {
     if (data.currentGrindSetting) specs.currentGrindSetting = data.currentGrindSetting;
   } else if (data.type === "dripper") {
     if (data.servings) specs.servings = data.servings;
+  } else if (data.type === "filter") {
+    if (data.remainingAmount) specs.remainingAmount = data.remainingAmount;
+    if (data.filterSize) specs.filterSize = data.filterSize;
   }
   return specs;
 }
@@ -53,6 +58,7 @@ const GRINDER_BRANDS: { brand: string; models: string[] }[] = [
 const TYPES: { value: Equipment["type"]; label: string }[] = [
   { value: "grinder", label: "그라인더" },
   { value: "dripper", label: "드리퍼" },
+  { value: "filter", label: "필터" },
   { value: "other", label: "기타" },
 ];
 
@@ -102,9 +108,11 @@ export function EquipmentForm({
       type: "grinder",
       currentGrindSetting: "",
       filterType: "",
+      filterSize: "",
       servings: "",
       precision: "",
       hasTimer: false,
+      remainingAmount: "",
       notes: "",
       ...defaultValues,
     },
@@ -275,6 +283,29 @@ export function EquipmentForm({
                       { label: "4인용", value: "4인용" },
                     ]}
                   />
+                )}
+              />
+            </Field>
+          </>
+        )}
+
+        {type === "filter" && (
+          <>
+            <Field label="사이즈">
+              <Controller
+                control={control}
+                name="filterSize"
+                render={({ field }) => (
+                  <input {...field} className={inputClass} placeholder="예: 02, 1~2인용, S" />
+                )}
+              />
+            </Field>
+            <Field label="잔여량">
+              <Controller
+                control={control}
+                name="remainingAmount"
+                render={({ field }) => (
+                  <UnitInput {...field} type="numeric" unit="장" placeholder="예: 100" />
                 )}
               />
             </Field>

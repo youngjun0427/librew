@@ -63,8 +63,20 @@ export function BottomNav() {
     { label: "홈", path: "/", icon: <HomeIcon active={isActive("/")} /> },
     { label: "레시피", path: "/recipe", icon: <RecipeIcon active={isActive("/recipe")} /> },
     { label: "추출", path: "/brew/prep", isBrew: true, icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="white" stroke="none">
-        <path d="M13 2L4.5 13.5H11L10 22L20.5 9.5H14L13 2Z" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {/* Dripper */}
+        <path d="M4.5 13L7 19.5C7.3 20.2 7.8 20.5 8.5 20.5C9.2 20.5 9.7 20.2 10 19.5L12.5 13" />
+        <line x1="3.5" y1="13" x2="13.5" y2="13" />
+        {/* Server */}
+        <path d="M6.5 20.5H10.5V21.5C10.5 22.5 9.5 23.5 8.5 23.5C7.5 23.5 6.5 22.5 6.5 21.5V20.5Z" />
+        {/* Kettle Body */}
+        <path d="M13.5 10.5V5.5C13.5 4.5 14.5 3.5 15.5 3.5H19.5C20.5 3.5 21.5 4.5 21.5 5.5V10.5C21.5 11.5 20.5 12.5 19.5 12.5H15.5C14.5 12.5 13.5 11.5 13.5 10.5Z" />
+        {/* Kettle Spout */}
+        <path d="M13.5 9.5C10 9.5 8.5 7 8.5 5.5" />
+        {/* Kettle Handle */}
+        <path d="M21.5 5.5H22.5C23.5 5.5 23.5 8.5 22.5 8.5H21.5" />
+        {/* Water Stream */}
+        <line x1="8.5" y1="7" x2="8.5" y2="11.5" strokeWidth="1.5" strokeDasharray="2 3" />
       </svg>
     )},
     { label: "장비", path: "/equipment", icon: <EquipmentIcon active={isActive("/equipment")} /> },

@@ -8,7 +8,7 @@ function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () => void }
   const ratio =
     recipe.coffeeWeight > 0 ? `1:${(recipe.waterWeight / recipe.coffeeWeight).toFixed(1)}` : "-";
   return (
-    <button className="mb-3 w-full rounded-2xl bg-zinc-800 p-4 text-left" onClick={onPress}>
+    <button className="mb-3 w-full rounded-2xl bg-zinc-800 p-4 text-left active:bg-zinc-700" onClick={onPress}>
       <p className="text-base font-semibold text-white">{recipe.title}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         <span className="text-sm text-zinc-400">{recipe.brewMethod}</span>

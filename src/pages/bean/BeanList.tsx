@@ -8,7 +8,7 @@ function BeanCard({ bean, onPress }: { bean: Bean; onPress: () => void }) {
   const pct =
     bean.totalWeight > 0 ? Math.round((bean.remainingWeight / bean.totalWeight) * 100) : 0;
   return (
-    <button className="mb-3 w-full rounded-2xl bg-zinc-800 p-4 text-left" onClick={onPress}>
+    <button className="mb-3 w-full rounded-2xl bg-zinc-800 p-4 text-left active:bg-zinc-700" onClick={onPress}>
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="text-base font-semibold text-white">{bean.name}</p>

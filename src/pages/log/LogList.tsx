@@ -50,7 +50,7 @@ export default function LogListPage() {
             return (
               <button
                 key={item.id}
-                className="mb-3 w-full rounded-2xl bg-zinc-800 p-4 text-left"
+                className="mb-3 w-full rounded-2xl bg-zinc-800 p-4 text-left active:bg-zinc-700"
                 onClick={() => navigate(`/log/${item.id}`)}
               >
                 <div className="flex items-start justify-between">

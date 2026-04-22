@@ -73,7 +73,7 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-900">
-      <div className="flex items-end justify-around px-1 pb-6 pt-2">
+      <div className="flex items-end justify-around px-1 pb-safe-6 pt-2">
         {tabs.map((tab) =>
           tab.isBrew ? (
             <button

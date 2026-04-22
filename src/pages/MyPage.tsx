@@ -1,14 +1,16 @@
 import { signOut } from "firebase/auth";
+import { useState } from "react";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { auth } from "../lib/firebase";
 import { useAuthStore } from "../store/useAuthStore";
 
 export default function MyPage() {
   const { user } = useAuthStore();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleLogout = async () => {
-    if (window.confirm("로그아웃 하시겠습니까?")) {
-      await signOut(auth);
-    }
+    setShowLogoutDialog(false);
+    await signOut(auth);
   };
 
   return (
@@ -27,12 +29,21 @@ export default function MyPage() {
         </div>
 
         <button
-          onClick={handleLogout}
+          onClick={() => setShowLogoutDialog(true)}
           className="w-full rounded-2xl bg-zinc-800 py-4 text-sm font-medium text-red-400 active:bg-zinc-700"
         >
           로그아웃
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={showLogoutDialog}
+        title="로그아웃 할까요?"
+        confirmLabel="로그아웃"
+        variant="danger"
+        onConfirm={handleLogout}
+        onClose={() => setShowLogoutDialog(false)}
+      />
     </div>
   );
 }

@@ -51,7 +51,7 @@ export default function BrewBeanPage() {
             return (
               <button
                 key={item.id}
-                className={`mb-3 w-full rounded-2xl border p-4 text-left ${
+                className={`mb-3 w-full rounded-2xl border p-4 text-left active:bg-zinc-700 ${
                   selected ? "border-amber-400 bg-zinc-800" : "border-zinc-700 bg-zinc-800"
                 }`}
                 onClick={() => setSelectedBean(selected ? null : item)}

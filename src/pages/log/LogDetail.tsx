@@ -1,5 +1,7 @@
 import type { Timestamp } from "firebase/firestore";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { ErrorView } from "../../components/ErrorView";
 import { LoadingView } from "../../components/LoadingView";
 import { useBeans } from "../../hooks/useBeans";
@@ -45,6 +47,7 @@ export default function LogDetailPage() {
   const { brewLogs, isLoading: logsLoading, error, deleteBrewLog } = useBrewLogs();
   const { recipes, isLoading: recLoading } = useRecipes();
   const { beans, isLoading: beansLoading } = useBeans();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const isLoading = logsLoading || recLoading || beansLoading;
 
@@ -66,7 +69,7 @@ export default function LogDetailPage() {
   const bean = log.beanId ? beans.find((b) => b.id === log.beanId) : null;
 
   const handleDelete = async () => {
-    if (!window.confirm("이 기록을 삭제할까요?")) return;
+    setShowDeleteDialog(false);
     await deleteBrewLog(id!);
     navigate(-1);
   };
@@ -75,7 +78,7 @@ export default function LogDetailPage() {
     <div className="min-h-screen overflow-y-auto bg-zinc-900 p-6 pt-14">
       <div className="mb-6 flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="text-amber-400">← 뒤로</button>
-        <button onClick={handleDelete} className="text-red-400">삭제</button>
+        <button onClick={() => setShowDeleteDialog(true)} className="text-red-400">삭제</button>
       </div>
 
       <h1 className="mb-1 text-2xl font-bold text-white">
@@ -129,6 +132,16 @@ export default function LogDetailPage() {
           </div>
         );
       })()}
+
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="기록을 삭제할까요?"
+        description="삭제하면 복구할 수 없어요"
+        confirmLabel="삭제"
+        variant="danger"
+        onConfirm={handleDelete}
+        onClose={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 }

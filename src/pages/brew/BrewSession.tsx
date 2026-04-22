@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { useBrewSessionStore } from "../../store/useBrewSessionStore";
 
 function formatTime(s: number) {
@@ -14,6 +15,7 @@ export default function BrewSessionPage() {
   const [stepIndex, setStepIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [stepElapsed, setStepElapsed] = useState(0);
+  const [showAbortDialog, setShowAbortDialog] = useState(false);
 
   const elapsedRef = useRef(0);
   const stepElapsedRef = useRef(0);
@@ -90,11 +92,7 @@ export default function BrewSessionPage() {
     }
   };
 
-  const handleHome = () => {
-    if (window.confirm("추출을 중단하시겠습니까?")) {
-      navigate("/", { replace: true });
-    }
-  };
+  const handleHome = () => setShowAbortDialog(true);
 
   return (
     <div className="flex h-screen flex-col bg-zinc-900">
@@ -197,6 +195,16 @@ export default function BrewSessionPage() {
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={showAbortDialog}
+        title="추출을 중단할까요?"
+        description="진행 중인 추출 기록은 저장되지 않아요"
+        confirmLabel="중단하기"
+        variant="danger"
+        onConfirm={() => navigate("/", { replace: true })}
+        onClose={() => setShowAbortDialog(false)}
+      />
 
       {/* 고정 하단: 다음 스텝 미리보기 */}
       <div className="px-5 pb-8 pt-2">

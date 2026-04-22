@@ -60,7 +60,7 @@ function RecentLogItem({
   const overall = log.sensoryNote?.overall;
 
   return (
-    <button onClick={onPress} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+    <button onClick={onPress} className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-zinc-800">
       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-zinc-700">
         <span className="text-base">☕</span>
       </div>
